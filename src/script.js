@@ -18,7 +18,7 @@ const thumb = document.getElementById('difficultyThumb');
 const label = document.getElementById('difficultyLabel');
 const dots = document.querySelectorAll('.difficulty-dot');
 
-const THUMB_POSITIONS = [5, 29, 53];
+const THUMB_POSITIONS = [4, 21, 39];
 
 function setDifficulty(index) {
   currentDifficulty = index;
@@ -34,3 +34,33 @@ document.getElementById('difficultyTrack').addEventListener('click', () => {
 });
 
 requestAnimationFrame(() => setDifficulty(0));
+
+const gameModeBtn = document.getElementById('gameModeBtn');
+const gameModePopup = document.getElementById('gameModePopup');
+const attemptsSlider = document.getElementById('attemptsSlider');
+const attemptsValue = document.getElementById('attemptsValue');
+const noLimitsCheck = document.getElementById('noLimitsCheck');
+
+let noLimits = false;
+
+gameModeBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  gameModePopup.classList.toggle('visible');
+});
+
+document.addEventListener('click', (e) => {
+  if (!gameModePopup.contains(e.target) && e.target !== gameModeBtn) {
+    gameModePopup.classList.remove('visible');
+  }
+});
+
+attemptsSlider.addEventListener('input', () => {
+  attemptsValue.textContent = attemptsSlider.value;
+});
+
+noLimitsCheck.addEventListener('click', () => {
+  noLimits = !noLimits;
+  noLimitsCheck.classList.toggle('checked', noLimits);
+  attemptsSlider.disabled = noLimits;
+  attemptsValue.style.opacity = noLimits ? '0.3' : '1';
+});
