@@ -363,20 +363,20 @@ body {
 
 .corner-timer .seconds {
   font-family: 'Figtree', sans-serif;
-  font-size: 52px;
+  font-size: 82px;
   font-weight: 900;
   color: #fff;
   letter-spacing: -2px;
   line-height: 1;
   position: absolute;
-  right: 60px;
+  right: 103px;
   top: 0;
   will-change: transform, opacity;
 }
 
 .corner-timer .millis {
   font-family: 'Figtree', sans-serif;
-  font-size: 52px;
+  font-size: 82px;
   font-weight: 900;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: -2px;
@@ -384,6 +384,19 @@ body {
   position: absolute;
   right: 0;
   top: 0;
-  width: 58px;
+  width: 100px;
   text-align: left;
+}
+
+.round-counter {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: -0.5px;
+  pointer-events: none;
+  user-select: none;
 }

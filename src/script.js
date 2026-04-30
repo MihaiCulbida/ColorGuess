@@ -170,6 +170,16 @@ document.getElementById('startBtn').addEventListener('click', async () => {
   cardTop.style.opacity = '0';
   cardFooter.style.opacity = '0';
 
+  const roundCounter = document.getElementById('roundCounter');
+const totalAttempts = noLimits ? null : parseInt(attemptsSlider.value);
+let currentRound = 1;
+
+if (totalAttempts) {
+  roundCounter.textContent = `${currentRound}/${totalAttempts}`;
+} else {
+  roundCounter.textContent = '';
+}
+
   await sleep(350);
 
   cardTop.style.display = 'none';
