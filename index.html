@@ -18,10 +18,14 @@
                 <p class="description secondary">Most people are worse at this than they think. Five <br> rounds to prove otherwise.</p>
                 <p class="description game-mode-hint">Set the number of attempts anywhere <br> from 1 to 10 or go limitless and play until <br> you decide to stop.</p>
             </div>
+            <div class="training-preview" id="trainingPreview" style="display:none; flex:1; border-radius:12px;"></div>
         </div>
         <div class="card-footer">
             <div class="game-mode-circle" id="gameModeBtn">
                 <img src="img/mode.png" alt="Game mode">
+            </div>
+            <div class="training-circle" id="trainingBtn">
+                <img src="img/training.png" alt="Training">
             </div>
             <div class="difficulty">
                 <div class="difficulty-track" id="difficultyTrack">
@@ -34,10 +38,11 @@
             </div>
             <div class="footer-right">
                 <button class="arrow-btn" id="startBtn">
-                    <img src="img/arroww.png" alt="Start">
+                    <img src="img/arrow.png" alt="Start">
                 </button>
             </div>
         </div>
+
         <div id="gameOverlay" style="display:none; position:absolute; inset:0;">
             <span id="countdownWord" class="countdown-word" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"></span>
             <div class="corner-timer" id="cornerTimer" style="display:none;">
@@ -45,6 +50,7 @@
                 <span class="millis" id="timerMillis">00</span>
             </div>
             <span class="round-counter" id="roundCounter"></span>
+
             <div class="hsl-panel" id="hslPanel" style="display:none; opacity:0;">
                 <div class="slider-wrap">
                     <div class="track-clip"><div class="track-bg" id="hBg"></div></div>
@@ -63,8 +69,37 @@
                 </div>
                 <div class="panel-right"></div>
             </div>
+            <button class="toggle-view-btn" id="toggleViewBtn" style="display:none;">
+              <img src="img/despit.png" alt="Toggle">
+            </button>
+            <button class="submit-btn" id="submitBtn" style="display:none;">
+              <img src="img/arrow.png" alt="Submit">
+            </button>
+            <div class="result-panel" id="resultPanel" style="display:none; opacity:0;">
+                <div class="result-half result-top" id="resultOriginalColor">
+                    <div class="result-score-block">
+                        <span class="result-score" id="resultScore">0</span>
+                        <span class="result-phrase" id="resultPhrase"></span>
+                    </div>
+                    <div class="result-color-info result-color-info--top">
+                        <span class="result-color-sublabel">Original</span>
+                        <span class="result-color-values" id="resultOriginalLabel"></span>
+                        <span class="result-color-name" id="resultOriginalName"></span>
+                    </div>
+                </div>
+                <div class="result-half result-bottom" id="resultGuessColor">
+                    <div class="result-color-info result-color-info--bottom">
+                        <span class="result-color-sublabel">Your selection</span>
+                        <span class="result-color-values" id="resultGuessLabel"></span>
+                    </div>
+                    <button class="result-next-btn" id="resultNextBtn">
+                        <img src="img/arrow.png" alt="Next">
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
     <div class="game-mode-popup" id="gameModePopup">
         <div class="popup-row">
             <span class="popup-label">Attempts</span>
@@ -76,6 +111,7 @@
             <div class="custom-checkbox" id="noLimitsCheck"></div>
         </label>
     </div>
+
     <script src="src/script.js"></script>
 </body>
 </html>

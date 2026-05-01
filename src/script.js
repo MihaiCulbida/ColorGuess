@@ -145,10 +145,10 @@ async function showColorRound(duration) {
   timerSeconds.style.opacity = '1';
   timerSeconds.style.transform = 'translateY(0)';
   card.style.transition = 'background 0.4s ease';
-card.style.background = '#0c0c0e';
-updateCounterColor(0, 0, 10);
+  card.style.background = '#0c0c0e';
+  updateCounterColor(0, 0, 10);
 
-await sleep(400);
+  await sleep(400);
 
   hS.value = 180; sS.value = 60; lS.value = 50;
   buildHueBg(); updateSliders(); updateThumbs();
@@ -288,3 +288,158 @@ function showSliderLabel(text) {
 hS.addEventListener('input', () => showSliderLabel('HUE'));
 sS.addEventListener('input', () => showSliderLabel('SATURATION'));
 lS.addEventListener('input', () => showSliderLabel('BRIGHTNESS'));
+
+function getColorName(h, s, l) {
+  if (l < 12) return 'Near Black';
+  if (l > 88) return 'Near White';
+  if (s < 12) {
+    if (l < 35) return 'Dark Gray';
+    if (l < 65) return 'Gray';
+    return 'Light Gray';
+  }
+  const hueNames = [
+    [10, 'Red'], [20, 'Red-Orange'], [35, 'Orange'], [50, 'Yellow-Orange'],
+    [65, 'Yellow'], [80, 'Yellow-Green'], [95, 'Chartreuse'], [135, 'Green'],
+    [155, 'Teal Green'], [170, 'Cyan-Green'], [185, 'Cyan'], [200, 'Sky Blue'],
+    [225, 'Blue'], [250, 'Indigo'], [270, 'Violet'], [290, 'Purple'],
+    [320, 'Magenta'], [340, 'Rose'], [360, 'Red']
+  ];
+  let name = 'Red';
+  for (const [limit, n] of hueNames) { if (h <= limit) { name = n; break; } }
+  const prefix = l < 35 ? 'Dark ' : l > 70 ? 'Light ' : s > 80 ? 'Vivid ' : '';
+  return prefix + name;
+}
+
+function calcScore(orig, guess) {
+  const dH = Math.min(Math.abs(orig.h - guess.h), 360 - Math.abs(orig.h - guess.h));
+  const dS = Math.abs(orig.s - guess.s);
+  const dL = Math.abs(orig.l - guess.l);
+  const dist = (dH / 180) * 0.5 + (dS / 100) * 0.25 + (dL / 100) * 0.25;
+  return Math.max(0, Math.round((1 - dist) * 10 * 10) / 10);
+}
+
+let trainingColor = null;
+
+function showResultScreen(original, guess) {
+  const score = calcScore(original, guess);
+  const panel = document.getElementById('resultPanel');
+
+  document.getElementById('resultOriginalColor').style.background = hslStr(original);
+  document.getElementById('resultOriginalLabel').textContent = `H${original.h} S${original.s} B${original.l}`;
+  document.getElementById('resultOriginalName').textContent = getColorName(original.h, original.s, original.l);
+
+  document.getElementById('resultGuessColor').style.background = hslStr(guess);
+  document.getElementById('resultGuessLabel').textContent = `H${guess.h} S${guess.s} B${guess.l}`;
+
+  document.getElementById('resultScore').textContent = score.toFixed(1);
+
+  panel.style.display = 'flex';
+  panel.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    panel.style.opacity = '1';
+  }));
+
+  hslPanel.style.display = 'none';
+  document.getElementById('toggleViewBtn').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'none';
+
+  card.style.transition = 'background 0.4s ease';
+  card.style.background = '#0c0c0e';
+}
+
+const submitBtn = document.getElementById('submitBtn');
+
+submitBtn.addEventListener('click', () => {
+  if (!trainingColor) return;
+  const guess = vals();
+  showResultScreen(trainingColor, guess);
+});
+
+document.getElementById('resultNextBtn').addEventListener('click', () => {
+  const panel = document.getElementById('resultPanel');
+  panel.style.opacity = '0';
+  setTimeout(() => {
+    panel.style.display = 'none';
+    startTraining();
+  }, 400);
+});
+
+async function startTraining() {
+  trainingColor = randomHSL();
+  card.style.transition = 'background 0.5s ease';
+  card.style.background = hslStr(trainingColor);
+  updateCounterColor(trainingColor.h, trainingColor.s, trainingColor.l);
+
+  await sleep(2000);
+
+  card.style.transition = 'background 0.4s ease';
+  card.style.background = '#0c0c0e';
+  updateCounterColor(0, 0, 10);
+  await sleep(400);
+
+  hS.value = 180; sS.value = 60; lS.value = 50;
+  buildHueBg(); updateSliders(); updateThumbs();
+
+  const roundCounter = document.getElementById('roundCounter');
+  roundCounter.textContent = '';
+  roundCounter.classList.add('shifted');
+
+  hslPanel.style.display = 'flex';
+  hslPanel.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    hslPanel.style.opacity = '1';
+  }));
+
+  submitBtn.style.display = 'flex';
+  showToggleBtn(trainingColor);
+}
+
+const trainingBtn = document.getElementById('trainingBtn');
+trainingBtn.addEventListener('click', async () => {
+  cardTop.style.transition = 'opacity 0.35s ease';
+  cardFooter.style.transition = 'opacity 0.35s ease';
+  cardTop.style.opacity = '0';
+  cardFooter.style.opacity = '0';
+
+  await sleep(350);
+  cardTop.style.display = 'none';
+  cardFooter.style.display = 'none';
+
+  document.getElementById('gameOverlay').style.display = 'flex';
+
+  await startTraining();
+});
+
+const toggleViewBtn = document.getElementById('toggleViewBtn');
+let showingAnswer = false;
+
+function showToggleBtn(color) {
+  toggleViewBtn.style.display = 'flex';
+  showingAnswer = false;
+
+  toggleViewBtn.onclick = () => {
+    showingAnswer = !showingAnswer;
+
+    if (showingAnswer) {
+      hslPanel.style.opacity = '0';
+      submitBtn.style.opacity = '0';
+      setTimeout(() => {
+        hslPanel.style.display = 'none';
+        submitBtn.style.display = 'none';
+        card.style.transition = 'background 0.4s ease';
+        card.style.background = hslStr(color);
+        updateCounterColor(color.h, color.s, color.l);
+      }, 400);
+    } else {
+      card.style.transition = 'background 0.4s ease';
+      card.style.background = `hsl(${hS.value},${sS.value}%,${lS.value}%)`;
+      updateCounterColor(+hS.value, +sS.value, +lS.value);
+      hslPanel.style.display = 'flex';
+      submitBtn.style.display = 'flex';
+      submitBtn.style.opacity = '1';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        hslPanel.style.opacity = '1';
+      }));
+    }
+  };
+}
