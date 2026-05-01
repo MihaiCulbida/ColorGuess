@@ -18,17 +18,21 @@ body {
   height: 430px;
   background: #0c0c0e;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.04),
-    0 8px 30px rgba(0, 0, 0, 0.25),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+    0 8px 30px rgba(0,0,0,0.25),
+    0 2px 8px rgba(0,0,0,0.15);
   padding: 2.2rem 2.2rem 1.6rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .card-top {
@@ -72,7 +76,7 @@ body {
     font-size: 13px;
     font-weight: 300;
     max-width: 330px;
-    color: rgba(255, 255, 255, 0.336);
+    color: rgba(255,255,255,0.336);
     line-height: 1.6;
     padding-top: 4px;
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -115,9 +119,7 @@ body {
 }
 
 .game-mode-popup {
-  position: absolute;
-  bottom: calc(100% + 14px);
-  left: 0;
+  position: fixed;
   background: #1b1b1f;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
@@ -131,7 +133,7 @@ body {
   pointer-events: none;
   transform: translateY(8px);
   transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 10;
+  z-index: 999;
 
   &.visible {
     opacity: 1;
@@ -303,7 +305,7 @@ body {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255,255,255,0.12);
   background: #1b1b1f;
   display: flex;
   align-items: center;
@@ -378,7 +380,7 @@ body {
   font-family: 'Figtree', sans-serif;
   font-size: 82px;
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255,255,255,0.55);
   letter-spacing: -2px;
   line-height: 1;
   position: absolute;
@@ -395,8 +397,124 @@ body {
   font-family: 'Figtree', sans-serif;
   font-size: 16px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
   letter-spacing: -0.5px;
+  user-select: none;
   pointer-events: none;
+  z-index: 10;
+  transition: left 0.4s ease;
+}
+
+.round-counter.shifted {
+  left: 160px;
+}
+
+.hsl-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  transition: opacity 0.4s ease;
+}
+
+.slider-wrap {
+  flex: 0 0 42px;
+  position: relative;
+  height: 100%;
+  overflow: visible;
+}
+
+.slider-wrap:first-child {
+  border-radius: 20px 0 0 20px;
+}
+
+.slider-wrap:first-child .track-clip {
+  border-radius: 20px 0 0 20px;
+}
+
+.track-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.track-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+input.vr {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  width: 430px;
+  height: 42px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center center;
+  background: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+}
+
+input.vr::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 42px;
+}
+
+input.vr::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: none;
+  margin-top: 11px;
+}
+
+input.vr::-moz-range-track { background: transparent; }
+input.vr::-moz-range-thumb {
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+  border: none;
+}
+
+.custom-thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.panel-right {
+  flex: 1;
+  position: relative;
+}
+
+#sliderLabel {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
   user-select: none;
 }

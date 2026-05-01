@@ -19,50 +19,63 @@
                 <p class="description game-mode-hint">Set the number of attempts anywhere <br> from 1 to 10 or go limitless and play until <br> you decide to stop.</p>
             </div>
         </div>
-
         <div class="card-footer">
             <div class="game-mode-circle" id="gameModeBtn">
-              <img src="img/mode.png" alt="Game mode">
+                <img src="img/mode.png" alt="Game mode">
             </div>
-
-            <div class="game-mode-popup" id="gameModePopup">
-              <div class="popup-row">
-                <span class="popup-label">Attempts</span>
-                <span class="popup-value" id="attemptsValue">5</span>
-              </div>
-              <input type="range" class="attempts-slider" id="attemptsSlider" min="1" max="10" value="5">
-              <label class="no-limits-row">
-                <span>No limits</span>
-                <div class="custom-checkbox" id="noLimitsCheck"></div>
-              </label>
-            </div>
-
             <div class="difficulty">
                 <div class="difficulty-track" id="difficultyTrack">
                     <div class="difficulty-thumb" id="difficultyThumb"></div>
-                    <div class="difficulty-dot" data-index="0"></div>
-                    <div class="difficulty-dot" data-index="1"></div>
-                    <div class="difficulty-dot" data-index="2"></div>
+                    <div class="difficulty-dot"></div>
+                    <div class="difficulty-dot"></div>
+                    <div class="difficulty-dot"></div>
                 </div>
                 <span class="difficulty-label" id="difficultyLabel">Easy</span>
             </div>
-
             <div class="footer-right">
                 <button class="arrow-btn" id="startBtn">
                     <img src="img/arroww.png" alt="Start">
                 </button>
             </div>
         </div>
-      <div id="gameOverlay" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; border-radius:20px; overflow:hidden;">
-        <span id="countdownWord" class="countdown-word"></span>
-      <div class="corner-timer" id="cornerTimer" style="display:none;">
-        <span class="seconds" id="timerSeconds">5</span>
-        <span class="millis" id="timerMillis">00</span>
-      </div>
-        <span class="round-counter" id="roundCounter"></span>
-      </div>
+        <div id="gameOverlay" style="display:none; position:absolute; inset:0;">
+            <span id="countdownWord" class="countdown-word" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"></span>
+            <div class="corner-timer" id="cornerTimer" style="display:none;">
+                <span class="seconds" id="timerSeconds">5</span>
+                <span class="millis" id="timerMillis">00</span>
+            </div>
+            <span class="round-counter" id="roundCounter"></span>
+            <div class="hsl-panel" id="hslPanel" style="display:none; opacity:0;">
+                <div class="slider-wrap">
+                    <div class="track-clip"><div class="track-bg" id="hBg"></div></div>
+                    <input class="vr" type="range" id="hS" min="0" max="359" value="180" step="1">
+                    <div class="custom-thumb" id="hThumb"></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="track-clip"><div class="track-bg" id="sBg"></div></div>
+                    <input class="vr" type="range" id="sS" min="0" max="100" value="60" step="1">
+                    <div class="custom-thumb" id="sThumb"></div>
+                </div>
+                <div class="slider-wrap">
+                    <div class="track-clip"><div class="track-bg" id="lBg"></div></div>
+                    <input class="vr" type="range" id="lS" min="0" max="100" value="50" step="1">
+                    <div class="custom-thumb" id="lThumb"></div>
+                </div>
+                <div class="panel-right"></div>
+            </div>
+        </div>
     </div>
-
+    <div class="game-mode-popup" id="gameModePopup">
+        <div class="popup-row">
+            <span class="popup-label">Attempts</span>
+            <span class="popup-value" id="attemptsValue">5</span>
+        </div>
+        <input type="range" class="attempts-slider" id="attemptsSlider" min="1" max="10" value="5">
+        <label class="no-limits-row">
+            <span>No limits</span>
+            <div class="custom-checkbox" id="noLimitsCheck"></div>
+        </label>
+    </div>
     <script src="src/script.js"></script>
 </body>
 </html>
