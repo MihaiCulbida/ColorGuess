@@ -297,8 +297,8 @@ function calcScore(orig, guess) {
   const nH = dH / 180;
   const nS = dS / 100;
   const nL = dL / 100;
-  const dist = (Math.pow(nH, 1.8) * 0.65 + Math.pow(nS, 1.8) * 0.20 + Math.pow(nL, 1.8) * 0.15);
-  const score = Math.max(0, 1 - Math.pow(dist, 0.55)) * 10;
+  const dist = (Math.pow(nH, 1.4) * 0.65 + Math.pow(nS, 1.4) * 0.20 + Math.pow(nL, 1.4) * 0.15);
+  const score = Math.max(0, 1 - Math.pow(dist, 0.5)) * 10;
 
   return Math.round(score * 100) / 100;
 }
@@ -313,6 +313,23 @@ function getAdaptiveColor(h, s, l, opacity = 1) {
   }
 }
 
+  function animateScore(targetScore) {
+  const el = document.getElementById('resultScore');
+  const duration = 800;
+  const start = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = eased * targetScore;
+    el.textContent = current.toFixed(2);
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = targetScore.toFixed(2);
+  }
+
+  requestAnimationFrame(tick);
+}
+
 function showResultScreen(original, guess) {
   const score = calcScore(original, guess);
   const panel = document.getElementById('resultPanel');
@@ -321,7 +338,6 @@ function showResultScreen(original, guess) {
   document.getElementById('resultGuessLabel').textContent = `H${guess.h} S${guess.s} B${guess.l}`;
   document.getElementById('resultOriginalColor').style.background = hslStr(original);
   document.getElementById('resultOriginalLabel').textContent = `H${original.h} S${original.s} B${original.l}`;
-  document.getElementById('resultScore').textContent = score.toFixed(2);
 
   const topColor = getAdaptiveColor(guess.h, guess.s, guess.l);
   const topColorFaded = getAdaptiveColor(guess.h, guess.s, guess.l, 0.5);
@@ -348,7 +364,7 @@ function showResultScreen(original, guess) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     panel.style.opacity = '1';
   }));
-
+  setTimeout(() => animateScore(score), 400);
   hslPanel.style.display = 'none';
   document.getElementById('toggleViewBtn').style.display = 'none';
   document.getElementById('submitBtn').style.display = 'none';
