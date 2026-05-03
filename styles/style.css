@@ -533,8 +533,8 @@ input.vr::-moz-range-thumb {
 
 #sliderLabel {
   position: absolute;
+  left: 150px;
   bottom: 24px;
-  right: 24px;
   font-family: "Figtree", sans-serif;
   font-size: 11px;
   font-weight: 800;
@@ -625,6 +625,14 @@ input.vr::-moz-range-thumb {
   padding: 20px 24px;
 }
 
+.result-half.result-top {
+  border-radius: 20px 20px 0 0;
+}
+
+.result-half.result-bottom {
+  border-radius: 0 0 20px 20px;
+}
+
 .result-score-block {
   position: absolute;
   bottom: 20px;
@@ -642,18 +650,7 @@ input.vr::-moz-range-thumb {
   letter-spacing: -3px;
   line-height: 1;
   color: #fff;
-  mix-blend-mode: overlay;
   opacity: 0.95;
-}
-
-.result-phrase {
-  font-family: "Figtree", sans-serif;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-  color: rgba(255, 255, 255, 0.7);
-  mix-blend-mode: overlay;
-  text-align: right;
 }
 
 .result-color-info {
@@ -665,11 +662,10 @@ input.vr::-moz-range-thumb {
 .result-color-sublabel {
   font-family: "DM Sans", sans-serif;
   font-size: 11px;
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  mix-blend-mode: overlay;
+  color: rgba(255, 255, 255, 0.4431372549);
 }
 
 .result-color-values {
@@ -677,16 +673,7 @@ input.vr::-moz-range-thumb {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: rgba(255, 255, 255, 0.9);
-  mix-blend-mode: overlay;
-}
-
-.result-color-name {
-  font-family: "DM Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.5);
-  mix-blend-mode: overlay;
+  color: #fff;
 }
 
 .result-next-btn {

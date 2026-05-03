@@ -243,6 +243,7 @@ function update() {
   card.style.transition = 'none';
   card.style.background = `hsl(${h},${s}%,${l}%)`;
   updateCounterColor(h, s, l);
+  updateGameBtnColors(h, s, l);  
 }
 
 function updateCounterColor(h, s, l) {
@@ -287,51 +288,60 @@ function showSliderLabel(text) {
 [hS, sS, lS].forEach(r => r.addEventListener('input', update));
 hS.addEventListener('input', () => showSliderLabel('HUE'));
 sS.addEventListener('input', () => showSliderLabel('SATURATION'));
-lS.addEventListener('input', () => showSliderLabel('BRIGHTNESS'));
-
-function getColorName(h, s, l) {
-  if (l < 12) return 'Near Black';
-  if (l > 88) return 'Near White';
-  if (s < 12) {
-    if (l < 35) return 'Dark Gray';
-    if (l < 65) return 'Gray';
-    return 'Light Gray';
-  }
-  const hueNames = [
-    [10, 'Red'], [20, 'Red-Orange'], [35, 'Orange'], [50, 'Yellow-Orange'],
-    [65, 'Yellow'], [80, 'Yellow-Green'], [95, 'Chartreuse'], [135, 'Green'],
-    [155, 'Teal Green'], [170, 'Cyan-Green'], [185, 'Cyan'], [200, 'Sky Blue'],
-    [225, 'Blue'], [250, 'Indigo'], [270, 'Violet'], [290, 'Purple'],
-    [320, 'Magenta'], [340, 'Rose'], [360, 'Red']
-  ];
-  let name = 'Red';
-  for (const [limit, n] of hueNames) { if (h <= limit) { name = n; break; } }
-  const prefix = l < 35 ? 'Dark ' : l > 70 ? 'Light ' : s > 80 ? 'Vivid ' : '';
-  return prefix + name;
-}
+lS.addEventListener('input', () => showSliderLabel('BRIGHTNESS'))
 
 function calcScore(orig, guess) {
   const dH = Math.min(Math.abs(orig.h - guess.h), 360 - Math.abs(orig.h - guess.h));
   const dS = Math.abs(orig.s - guess.s);
   const dL = Math.abs(orig.l - guess.l);
-  const dist = (dH / 180) * 0.5 + (dS / 100) * 0.25 + (dL / 100) * 0.25;
-  return Math.max(0, Math.round((1 - dist) * 10 * 10) / 10);
+  const nH = dH / 180;
+  const nS = dS / 100;
+  const nL = dL / 100;
+  const dist = (Math.pow(nH, 1.8) * 0.65 + Math.pow(nS, 1.8) * 0.20 + Math.pow(nL, 1.8) * 0.15);
+  const score = Math.max(0, 1 - Math.pow(dist, 0.55)) * 10;
+
+  return Math.round(score * 100) / 100;
 }
 
 let trainingColor = null;
+
+function getAdaptiveColor(h, s, l, opacity = 1) {
+  if (l > 55) {
+    return `hsla(${h}, ${Math.max(s - 20, 0)}%, 15%, ${opacity})`;
+  } else {
+    return `hsla(${h}, ${Math.max(s - 20, 0)}%, 85%, ${opacity})`;
+  }
+}
 
 function showResultScreen(original, guess) {
   const score = calcScore(original, guess);
   const panel = document.getElementById('resultPanel');
 
-  document.getElementById('resultOriginalColor').style.background = hslStr(original);
-  document.getElementById('resultOriginalLabel').textContent = `H${original.h} S${original.s} B${original.l}`;
-  document.getElementById('resultOriginalName').textContent = getColorName(original.h, original.s, original.l);
-
   document.getElementById('resultGuessColor').style.background = hslStr(guess);
   document.getElementById('resultGuessLabel').textContent = `H${guess.h} S${guess.s} B${guess.l}`;
+  document.getElementById('resultOriginalColor').style.background = hslStr(original);
+  document.getElementById('resultOriginalLabel').textContent = `H${original.h} S${original.s} B${original.l}`;
+  document.getElementById('resultScore').textContent = score.toFixed(2);
 
-  document.getElementById('resultScore').textContent = score.toFixed(1);
+  const topColor = getAdaptiveColor(guess.h, guess.s, guess.l);
+  const topColorFaded = getAdaptiveColor(guess.h, guess.s, guess.l, 0.5);
+  const topBorder = getAdaptiveColor(guess.h, guess.s, guess.l, 0.18);
+
+  document.getElementById('resultScore').style.color = topColor;
+  document.getElementById('resultGuessColor').querySelector('.result-color-sublabel').style.color = topColorFaded;
+  document.getElementById('resultGuessColor').querySelector('.result-color-values').style.color = topColor;
+
+  const botColor = getAdaptiveColor(original.h, original.s, original.l);
+  const botColorFaded = getAdaptiveColor(original.h, original.s, original.l, 0.5);
+  const botBorder = getAdaptiveColor(original.h, original.s, original.l, 0.18);
+
+  document.getElementById('resultOriginalColor').querySelector('.result-color-sublabel').style.color = botColorFaded;
+  document.getElementById('resultOriginalColor').querySelector('.result-color-values').style.color = botColor;
+
+  const nextBtn = document.getElementById('resultNextBtn');
+  nextBtn.style.borderColor = botBorder;
+  nextBtn.style.background = getAdaptiveColor(original.h, original.s, original.l, 0.12);
+  nextBtn.querySelector('img').style.filter = original.l > 55 ? 'invert(0)' : 'invert(1)';
 
   panel.style.display = 'flex';
   panel.style.opacity = '0';
@@ -369,7 +379,6 @@ async function startTraining() {
   card.style.transition = 'background 0.5s ease';
   card.style.background = hslStr(trainingColor);
   updateCounterColor(trainingColor.h, trainingColor.s, trainingColor.l);
-
   await sleep(2000);
 
   card.style.transition = 'background 0.4s ease';
@@ -383,7 +392,6 @@ async function startTraining() {
   const roundCounter = document.getElementById('roundCounter');
   roundCounter.textContent = '';
   roundCounter.classList.add('shifted');
-
   hslPanel.style.display = 'flex';
   hslPanel.style.opacity = '0';
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -413,9 +421,26 @@ trainingBtn.addEventListener('click', async () => {
 const toggleViewBtn = document.getElementById('toggleViewBtn');
 let showingAnswer = false;
 
+function updateGameBtnColors(h, s, l) {
+  const adaptive = getAdaptiveColor(h, s, l, 0.12);
+  const adaptiveBorder = getAdaptiveColor(h, s, l, 0.18);
+  const imgFilter = l > 55 ? 'invert(0)' : 'invert(1)';
+  const toggleBtn = document.getElementById('toggleViewBtn');
+  toggleBtn.style.background = adaptive;
+  toggleBtn.style.borderColor = adaptiveBorder;
+  toggleBtn.querySelector('img').style.filter = imgFilter;
+  const subBtn = document.getElementById('submitBtn');
+  subBtn.style.background = adaptive;
+  subBtn.style.borderColor = adaptiveBorder;
+  subBtn.querySelector('img').style.filter = imgFilter;
+}
+
+
+
 function showToggleBtn(color) {
   toggleViewBtn.style.display = 'flex';
   showingAnswer = false;
+  updateGameBtnColors(+hS.value, +sS.value, +lS.value);
 
   toggleViewBtn.onclick = () => {
     showingAnswer = !showingAnswer;
@@ -429,11 +454,13 @@ function showToggleBtn(color) {
         card.style.transition = 'background 0.4s ease';
         card.style.background = hslStr(color);
         updateCounterColor(color.h, color.s, color.l);
+        updateGameBtnColors(color.h, color.s, color.l);
       }, 400);
     } else {
       card.style.transition = 'background 0.4s ease';
       card.style.background = `hsl(${hS.value},${sS.value}%,${lS.value}%)`;
       updateCounterColor(+hS.value, +sS.value, +lS.value);
+      updateGameBtnColors(+hS.value, +sS.value, +lS.value);
       hslPanel.style.display = 'flex';
       submitBtn.style.display = 'flex';
       submitBtn.style.opacity = '1';
