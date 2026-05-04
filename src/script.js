@@ -27,6 +27,10 @@ document.getElementById('difficultyTrack').addEventListener('click', () => {
   setDifficulty((currentDifficulty + 1) % 3);
 });
 
+document.getElementById('difficultyLabel').addEventListener('click', () => {
+  setDifficulty((currentDifficulty + 1) % 3);
+});
+
 requestAnimationFrame(() => setDifficulty(0));
 
 const gameModeBtn = document.getElementById('gameModeBtn');
@@ -103,7 +107,7 @@ function getScorePhrase(score) {
   if (score >= 8.0) return pick(["Good eye.", "Above average, clearly.", "You've done this before.", "Respectable.", "That's a good guess."]);
   if (score >= 7.5) return pick(["Not bad.", "Closer than it looks.", "You felt it.", "Decent instinct.", "Your eyes are warming up."]);
   if (score >= 7.0) return pick(["Pretty close.", "In the right zone.", "Getting warmer.", "Almost on it."]);
-  if (score >= 6.0) return pick(["Okay.", "Not embarrassing.", "You tried.", "Average at best.", "The vibe was right, at least."]);
+  if (score >= 6.0) return pick(["Okay.", "Not embarrassing.", "You tried.", "Average at best.", "Right vibe, wrong color, wrong shade, wrong planet."]);
   if (score >= 5.0) return pick(["Middling.", "You were in the neighbourhood.", "Could be worse.", "Not your best work."]);
   if (score >= 4.0) return pick(["Off.", "You guessed, didn't you?", "The hue was a stretch.", "Questionable.", "Somewhere in the ballpark."]);
   if (score >= 3.0) return pick(["Wide of the mark.", "Were you even looking?", "Bold choice.", "That's a different colour.", "Room to improve is an understatement."]);
