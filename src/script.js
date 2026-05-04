@@ -83,13 +83,39 @@ async function showCountdownWord(text, color) {
   const el = document.getElementById('countdownWord');
   el.textContent = text;
   el.classList.add('visible');
-  await sleep(900);
+  await sleep(650);
   el.classList.remove('visible');
-  await sleep(300);
+  await sleep(200);
+}
+
+let currentGameColor = null;
+let currentRound = 1;
+let gameTotalAttempts = null;
+let gameResultNextAction = null;
+
+function getScorePhrase(score) {
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  if (score === 10) return pick(["Impossible.", "Are you cheating?", "Pixel perfect.", "That's not human."]);
+  if (score >= 9.8) return pick(["Essentially perfect.", "Frighteningly accurate.", "Your eyes are calibrated.", "That's unsettling.", "Save this screenshot."]);
+  if (score >= 9.5) return pick(["Uncanny.", "You barely missed.", "Almost doesn't cover it.", "One step from perfect.", "Your retinas are lying."]);
+  if (score >= 9.0) return pick(["Really sharp.", "You have a good eye.", "Dialed in.", "Colour-blind people hate you.", "Close enough to hurt."]);
+  if (score >= 8.5) return pick(["Solid.", "You're getting it.", "Nearly there.", "A squint away from perfect.", "Strong effort."]);
+  if (score >= 8.0) return pick(["Good eye.", "Above average, clearly.", "You've done this before.", "Respectable.", "That's a good guess."]);
+  if (score >= 7.5) return pick(["Not bad.", "Closer than it looks.", "You felt it.", "Decent instinct.", "Your eyes are warming up."]);
+  if (score >= 7.0) return pick(["Pretty close.", "In the right zone.", "Getting warmer.", "Almost on it."]);
+  if (score >= 6.0) return pick(["Okay.", "Not embarrassing.", "You tried.", "Average at best.", "The vibe was right, at least."]);
+  if (score >= 5.0) return pick(["Middling.", "You were in the neighbourhood.", "Could be worse.", "Not your best work."]);
+  if (score >= 4.0) return pick(["Off.", "You guessed, didn't you?", "The hue was a stretch.", "Questionable.", "Somewhere in the ballpark."]);
+  if (score >= 3.0) return pick(["Wide of the mark.", "Were you even looking?", "Bold choice.", "That's a different colour.", "Room to improve is an understatement."]);
+  if (score >= 2.0) return pick(["Yikes.", "That was brave.", "Interesting interpretation.", "Try again.", "The colour disagreed with you."]);
+  if (score >= 1.0) return pick(["Oh.", "We don't talk about this one.", "A valiant failure.", "Colours are hard, apparently.", "The colour had other plans."]);
+  return pick(["0 doesn't exist, yet here we are.", "Impressive, in a bad way.", "That was something.", "Did you close your eyes?", "Back to basics."]);
 }
 
 async function showColorRound(duration) {
   const color = randomHSL();
+  currentGameColor = color;
+
   card.style.transition = 'background 0.5s ease';
   card.style.background = hslStr(color);
   updateCounterColor(color.h, color.s, color.l);
@@ -153,13 +179,19 @@ async function showColorRound(duration) {
   hS.value = 180; sS.value = 60; lS.value = 50;
   buildHueBg(); updateSliders(); updateThumbs();
 
-  document.getElementById('roundCounter').classList.add('shifted');
+  const rc = document.getElementById('roundCounter');
+  rc.classList.add('shifted');
 
   hslPanel.style.display = 'flex';
   hslPanel.style.opacity = '0';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     hslPanel.style.opacity = '1';
   }));
+
+  submitBtn.style.display = 'flex';
+  submitBtn.style.opacity = '1';
+  updateGameBtnColors(+hS.value, +sS.value, +lS.value);
+  document.getElementById('toggleViewBtn').style.display = 'none';
 }
 
 document.getElementById('startBtn').addEventListener('click', async () => {
@@ -168,10 +200,11 @@ document.getElementById('startBtn').addEventListener('click', async () => {
   cardTop.style.opacity = '0';
   cardFooter.style.opacity = '0';
 
+  gameTotalAttempts = noLimits ? null : parseInt(attemptsSlider.value);
+  currentRound = 1;
+
   const roundCounter = document.getElementById('roundCounter');
-  const totalAttempts = noLimits ? null : parseInt(attemptsSlider.value);
-  let currentRound = 1;
-  roundCounter.textContent = totalAttempts ? `${currentRound}/${totalAttempts}` : '';
+  roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
   roundCounter.classList.remove('shifted');
 
   await sleep(350);
@@ -313,7 +346,7 @@ function getAdaptiveColor(h, s, l, opacity = 1) {
   }
 }
 
-  function animateScore(targetScore) {
+function animateScore(targetScore) {
   const el = document.getElementById('resultScore');
   const duration = 800;
   const start = performance.now();
@@ -330,7 +363,7 @@ function getAdaptiveColor(h, s, l, opacity = 1) {
   requestAnimationFrame(tick);
 }
 
-function showResultScreen(original, guess) {
+function showResultScreen(original, guess, showPhrase) {
   const score = calcScore(original, guess);
   const panel = document.getElementById('resultPanel');
 
@@ -347,6 +380,14 @@ function showResultScreen(original, guess) {
   document.getElementById('resultGuessColor').querySelector('.result-color-sublabel').style.color = topColorFaded;
   document.getElementById('resultGuessColor').querySelector('.result-color-values').style.color = topColor;
 
+  const phraseEl = document.getElementById('resultScorePhrase');
+  if (showPhrase) {
+    phraseEl.textContent = getScorePhrase(score);
+    phraseEl.style.display = 'block';
+  } else {
+    phraseEl.style.display = 'none';
+  }
+
   const botColor = getAdaptiveColor(original.h, original.s, original.l);
   const botColorFaded = getAdaptiveColor(original.h, original.s, original.l, 0.5);
   const botBorder = getAdaptiveColor(original.h, original.s, original.l, 0.18);
@@ -358,6 +399,10 @@ function showResultScreen(original, guess) {
   nextBtn.style.borderColor = botBorder;
   nextBtn.style.background = getAdaptiveColor(original.h, original.s, original.l, 0.12);
   nextBtn.querySelector('img').style.filter = original.l > 55 ? 'invert(0)' : 'invert(1)';
+
+  const rc = document.getElementById('roundCounter');
+  rc.style.zIndex = '40';
+  rc.classList.remove('shifted');
 
   panel.style.display = 'flex';
   panel.style.opacity = '0';
@@ -376,22 +421,62 @@ function showResultScreen(original, guess) {
 const submitBtn = document.getElementById('submitBtn');
 
 submitBtn.addEventListener('click', () => {
-  if (!trainingColor) return;
   const guess = vals();
-  showResultScreen(trainingColor, guess);
+
+  if (currentGameColor) {
+    const isLastRound = gameTotalAttempts !== null && currentRound >= gameTotalAttempts;
+    gameResultNextAction = isLastRound ? 'end' : 'next';
+    showResultScreen(currentGameColor, guess, true);
+    currentGameColor = null;
+    return;
+  }
+
+  if (trainingColor) {
+    gameResultNextAction = 'training';
+    showResultScreen(trainingColor, guess, false);
+  }
 });
 
-document.getElementById('resultNextBtn').addEventListener('click', () => {
+document.getElementById('resultNextBtn').addEventListener('click', async () => {
   const panel = document.getElementById('resultPanel');
   panel.style.opacity = '0';
-  setTimeout(() => {
-    panel.style.display = 'none';
+
+  await sleep(400);
+  panel.style.display = 'none';
+
+  if (gameResultNextAction === 'training') {
     startTraining();
-  }, 400);
+  } else if (gameResultNextAction === 'next') {
+    currentRound++;
+    const roundCounter = document.getElementById('roundCounter');
+    roundCounter.style.transition = 'none';
+    roundCounter.classList.remove('shifted');
+    roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
+    roundCounter.style.zIndex = '10';
+    requestAnimationFrame(() => { roundCounter.style.transition = ''; });
+    await showCountdownWord('ready', hslStr(randomHSL()));
+    await showCountdownWord('set', hslStr(randomHSL()));
+    await showCountdownWord('go', hslStr(randomHSL()));
+    await showColorRound(DURATIONS[currentDifficulty]);
+  } else if (gameResultNextAction === 'end') {
+    document.getElementById('gameOverlay').style.display = 'none';
+    const roundCounter = document.getElementById('roundCounter');
+    roundCounter.textContent = '';
+    roundCounter.classList.remove('shifted');
+    card.style.transition = 'background 0.4s ease';
+    card.style.background = '#0c0c0e';
+    cardTop.style.display = 'flex';
+    cardFooter.style.display = 'flex';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      cardTop.style.opacity = '1';
+      cardFooter.style.opacity = '1';
+    }));
+  }
 });
 
 async function startTraining() {
   trainingColor = randomHSL();
+  currentGameColor = null;
   card.style.transition = 'background 0.5s ease';
   card.style.background = hslStr(trainingColor);
   updateCounterColor(trainingColor.h, trainingColor.s, trainingColor.l);
@@ -450,8 +535,6 @@ function updateGameBtnColors(h, s, l) {
   subBtn.style.borderColor = adaptiveBorder;
   subBtn.querySelector('img').style.filter = imgFilter;
 }
-
-
 
 function showToggleBtn(color) {
   toggleViewBtn.style.display = 'flex';

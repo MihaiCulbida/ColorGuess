@@ -705,4 +705,15 @@ input.vr::-moz-range-thumb {
   height: 18px;
   filter: invert(1);
   opacity: 0.9;
+}
+
+.result-phrase {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  color: #fff;
+  opacity: 0.55;
+  margin-top: 4px;
+  display: block;
 }/*# sourceMappingURL=style.css.map */
