@@ -96,6 +96,8 @@ let currentGameColor = null;
 let currentRound = 1;
 let gameTotalAttempts = null;
 let gameResultNextAction = null;
+let roundScores = [];
+let roundColors = [];
 
 function getScorePhrase(score) {
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -206,6 +208,8 @@ document.getElementById('startBtn').addEventListener('click', async () => {
 
   gameTotalAttempts = noLimits ? null : parseInt(attemptsSlider.value);
   currentRound = 1;
+  roundScores = [];
+  roundColors = [];
 
   const roundCounter = document.getElementById('roundCounter');
   roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
@@ -430,6 +434,8 @@ submitBtn.addEventListener('click', () => {
   if (currentGameColor) {
     const isLastRound = gameTotalAttempts !== null && currentRound >= gameTotalAttempts;
     gameResultNextAction = isLastRound ? 'end' : 'next';
+    roundScores.push(calcScore(currentGameColor, guess));
+    roundColors.push({ original: currentGameColor, guess });
     showResultScreen(currentGameColor, guess, true);
     currentGameColor = null;
     return;
@@ -463,20 +469,163 @@ document.getElementById('resultNextBtn').addEventListener('click', async () => {
     await showCountdownWord('go', hslStr(randomHSL()));
     await showColorRound(DURATIONS[currentDifficulty]);
   } else if (gameResultNextAction === 'end') {
-    document.getElementById('gameOverlay').style.display = 'none';
-    const roundCounter = document.getElementById('roundCounter');
-    roundCounter.textContent = '';
-    roundCounter.classList.remove('shifted');
-    card.style.transition = 'background 0.4s ease';
-    card.style.background = '#0c0c0e';
-    cardTop.style.display = 'flex';
-    cardFooter.style.display = 'flex';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      cardTop.style.opacity = '1';
-      cardFooter.style.opacity = '1';
-    }));
+    showSummaryScreen();
   }
 });
+
+
+function getFinalPhrase(pct) {
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  if (pct >= 98) return pick(["You might actually be a monitor.", "Suspiciously good.", "We're checking for cheats.", "Inhuman precision."]);
+  if (pct >= 90) return pick(["Exceptional. Genuinely.", "Your eyes are a weapon.", "Top tier colour instinct.", "Almost unsettling how good that was."]);
+  if (pct >= 80) return pick(["Really strong overall.", "You clearly have an eye for this.", "Solid session.", "Above average doesn't cut it — that was great."]);
+  if (pct >= 70) return pick(["Good, not great.", "Respectable. Room to grow.", "You're getting there.", "Fine dining at Applebee's."]);
+  if (pct >= 60) return pick(["Decent enough.", "Average with flashes of brilliance.", "Some good, some rough.", "Could be worse. Could be better."]);
+  if (pct >= 50) return pick(["Right down the middle.", "Perfectly mediocre.", "Exactly half of what's possible.", "The definition of average."]);
+  if (pct >= 35) return pick(["Below average, but you tried.", "The colours weren't cooperating.", "Rough session.", "There's nowhere to go but up."]);
+  if (pct >= 20) return pick(["That was a struggle.", "The colours won this time.", "Maybe try training mode first.", "Bold attempt."]);
+  return pick(["We don't talk about this.", "Did you play with your eyes closed?", "Impressively bad.", "Back to basics."]);
+}
+
+function showSummaryScreen() {
+  const total = roundScores.reduce((a, b) => a + b, 0);
+  const maxScore = gameTotalAttempts * 10;
+  const pct = (total / maxScore) * 100;
+  const overlay = document.getElementById('gameOverlay');
+  const existing = document.getElementById('summaryPanel');
+  if (existing) existing.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'summaryPanel';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'summary-close-btn';
+  closeBtn.innerHTML = '<img src="img/close.png">';
+  const resetOverlay = () => {
+    panel.style.opacity = '0';
+    setTimeout(() => {
+      panel.remove();
+      overlay.style.display = 'none';
+      const rc = document.getElementById('roundCounter');
+      rc.textContent = '';
+      rc.classList.remove('shifted');
+      rc.style.zIndex = '10';
+      card.style.transition = 'background 0.4s ease';
+      card.style.background = '#0c0c0e';
+      cardTop.style.display = 'flex';
+      cardFooter.style.display = 'flex';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        cardTop.style.opacity = '1';
+        cardFooter.style.opacity = '1';
+      }));
+    }, 400);
+  };
+  closeBtn.addEventListener('click', resetOverlay);
+
+  const scoreRow = document.createElement('div');
+  scoreRow.className = 'summary-score-row';
+  const scoreTotalEl = document.createElement('span');
+  scoreTotalEl.className = 'summary-score-total';
+  scoreTotalEl.textContent = '0';
+  const scoreMaxEl = document.createElement('span');
+  scoreMaxEl.className = 'summary-score-max';
+  scoreMaxEl.textContent = '/' + maxScore;
+  scoreRow.appendChild(scoreTotalEl);
+  scoreRow.appendChild(scoreMaxEl);
+  const phraseEl = document.createElement('p');
+  phraseEl.className = 'summary-phrase';
+  phraseEl.textContent = getFinalPhrase(pct);
+  const colorsGrid = document.createElement('div');
+  colorsGrid.className = 'summary-colors-grid';
+  const cellSize = 72;
+
+  roundColors.forEach((entry, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'summary-color-cell';
+    cell.style.setProperty('--cell-size', cellSize + 'px');
+
+    const origHalf = document.createElement('div');
+    origHalf.className = 'orig-half';
+    origHalf.style.background = hslStr(entry.original);
+
+    const guessHalf = document.createElement('div');
+    guessHalf.className = 'guess-half';
+    guessHalf.style.background = hslStr(entry.guess);
+
+    const scoreLabel = document.createElement('span');
+    scoreLabel.className = 'cell-score';
+    scoreLabel.style.color = entry.original.l > 55 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)';
+    scoreLabel.textContent = roundScores[i].toFixed(2);
+
+    cell.appendChild(origHalf);
+    cell.appendChild(guessHalf);
+    cell.appendChild(scoreLabel);
+    colorsGrid.appendChild(cell);
+  });
+
+  const playAgainBtn = document.createElement('button');
+  playAgainBtn.className = 'summary-play-again-btn';
+  playAgainBtn.textContent = 'Play again';
+  playAgainBtn.addEventListener('click', async () => {
+  panel.style.opacity = '0';
+  await sleep(400);
+  panel.remove();
+  overlay.style.display = 'none';
+
+  const roundCounter = document.getElementById('roundCounter');
+  roundCounter.textContent = '';
+  roundCounter.classList.remove('shifted');
+  roundCounter.style.zIndex = '10';
+  card.style.transition = 'background 0.4s ease';
+  card.style.background = '#0c0c0e';
+  cardTop.style.display = 'flex';
+  cardFooter.style.display = 'flex';
+
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  cardTop.style.opacity = '1';
+  cardFooter.style.opacity = '1';
+  await sleep(350);
+
+  currentRound = 1;
+  roundScores = [];
+  roundColors = [];
+  roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
+
+  cardTop.style.opacity = '0';
+  cardFooter.style.opacity = '0';
+  await sleep(350);
+  cardTop.style.display = 'none';
+  cardFooter.style.display = 'none';
+
+  overlay.style.display = 'flex';
+  await showCountdownWord('ready', hslStr(randomHSL()));
+  await showCountdownWord('set', hslStr(randomHSL()));
+  await showCountdownWord('go', hslStr(randomHSL()));
+  await showColorRound(DURATIONS[currentDifficulty]);
+});
+
+  panel.appendChild(closeBtn);
+  panel.appendChild(scoreRow);
+  panel.appendChild(phraseEl);
+  panel.appendChild(colorsGrid);
+  panel.appendChild(playAgainBtn);
+  overlay.appendChild(panel);
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    panel.style.opacity = '1';
+  }));
+
+  const duration = 900;
+  const startT = performance.now();
+  function animTotal(now) {
+    const progress = Math.min((now - startT) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    scoreTotalEl.textContent = (eased * total).toFixed(2);
+    if (progress < 1) requestAnimationFrame(animTotal);
+    else scoreTotalEl.textContent = total.toFixed(2);
+  }
+  setTimeout(() => requestAnimationFrame(animTotal), 300);
+}
 
 async function startTraining() {
   trainingColor = randomHSL();

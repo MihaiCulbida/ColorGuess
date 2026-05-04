@@ -608,8 +608,8 @@ input.vr::-moz-range-thumb {
   &:active { transform: scale(0.95); }
 
   img {
-    width: 18px;
-    height: 18px;
+    width: 23px;
+    height: 23px;
     filter: invert(1);
     opacity: 0.9;
   }
@@ -728,8 +728,147 @@ input.vr::-moz-range-thumb {
   font-weight: 300;
   letter-spacing: 0.01em;
   color: #fff;
-  opacity: 0.55;
   margin-top: 4px;
   display: block;
   user-select: none;
+}
+
+#summaryPanel {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: #0c0c0e;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 28px 24px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  overflow: hidden;
+  user-select: none;
+
+  .summary-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+      filter: invert(1);
+      opacity: 0.8;
+    }
+  }
+
+  .summary-score-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    margin-top: 8px;
+  }
+
+  .summary-score-total {
+    font-family: 'Figtree', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    color: #fff;
+  }
+
+  .summary-score-max {
+    font-family: 'Figtree', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .summary-phrase {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 10px;
+    letter-spacing: 0.01em;
+  }
+
+  .summary-colors-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .summary-color-cell {
+    width: var(--cell-size, 60px);
+    height: var(--cell-size, 60px);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    flex-shrink: 0;
+
+    .orig-half {
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+    }
+
+    .guess-half {
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    }
+
+    .cell-score {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-family: 'Figtree', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      z-index: 2;
+    }
+  }
+
+  .summary-play-again-btn {
+    margin-top: 16px;
+    width: 100%;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    font-family: 'Figtree', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+  }
 }
