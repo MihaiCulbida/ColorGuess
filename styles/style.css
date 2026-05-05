@@ -33,6 +33,7 @@ body {
 }
 
 .card-top {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -63,8 +64,8 @@ body {
 
 .description {
   font-size: 15px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7019607843);
   line-height: 1.55;
   letter-spacing: -0.01em;
   -webkit-user-select: none;
@@ -73,18 +74,18 @@ body {
 }
 .description.secondary {
   font-size: 14px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4784313725);
   line-height: 1.6;
 }
 .description.game-mode-hint {
   font-size: 13px;
-  font-weight: 300;
+  font-weight: 600;
   max-width: 330px;
-  color: rgba(255, 255, 255, 0.336);
+  color: rgba(255, 255, 255, 0.337254902);
   line-height: 1.6;
   padding-top: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.0509803922);
 }
 
 .card-footer {
@@ -890,4 +891,25 @@ input.vr::-moz-range-thumb {
 #summaryPanel .summary-play-again-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
+}
+
+.hint-bar {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  height: 5px;
+  margin-top: auto;
+}
+
+.hint-bar.visible {
+  opacity: 1;
+  transition: opacity 500ms ease 300ms;
 }/*# sourceMappingURL=style.css.map */

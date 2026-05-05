@@ -36,6 +36,7 @@ body {
 }
 
 .card-top {
+  position:relative;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -62,27 +63,27 @@ body {
 
 .description {
   font-size: 15px;
-  font-weight: 400;
-  color: rgba(255,255,255,0.7);
+  font-weight: 700;
+  color: #ffffffb3;
   line-height: 1.55;
   letter-spacing: -0.01em;
   user-select: none;
 
   &.secondary {
     font-size: 14px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.35);
+    font-weight: 600;
+    color: #ffffff7a;
     line-height: 1.6;
   }
 
   &.game-mode-hint {
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 600;
     max-width: 330px;
-    color: rgba(255,255,255,0.336);
+    color: #ffffff56;
     line-height: 1.6;
     padding-top: 4px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid #ffffff0d;
   }
 }
 
@@ -871,4 +872,23 @@ input.vr::-moz-range-thumb {
       color: #fff;
     }
   }
+}
+
+.hint-bar {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  pointer-events: none;
+  user-select: none;
+  height: 5px;
+  margin-top: auto;
+}
+
+.hint-bar.visible {
+  opacity: 1;
+  transition: opacity 500ms ease 300ms;
 }

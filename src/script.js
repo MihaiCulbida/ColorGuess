@@ -722,3 +722,22 @@ function showToggleBtn(color) {
     }
   };
 }
+
+const hintBar = document.getElementById('hintBar');
+const hintMap = [
+  { el: document.getElementById('gameModeBtn'), text: 'Set number of attempts or go limitless.' },
+  { el: document.getElementById('trainingBtn'), text: 'Memorize a color, then try to recreate it.' },
+  { el: document.getElementById('difficultyTrack'), text: 'Change the game difficulty.' },
+  { el: document.getElementById('difficultyLabel'), text: 'Change the game difficulty.' },
+  { el: document.getElementById('startBtn'), text: 'Start the game.' },
+];
+
+hintMap.forEach(({ el, text }) => {
+  el.addEventListener('mouseenter', () => {
+    hintBar.textContent = text;
+    hintBar.classList.add('visible');
+  });
+  el.addEventListener('mouseleave', () => {
+    hintBar.classList.remove('visible');
+  });
+});
