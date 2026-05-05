@@ -732,12 +732,19 @@ const hintMap = [
   { el: document.getElementById('startBtn'), text: 'Start the game.' },
 ];
 
+let hintTimeout = null;
+
 hintMap.forEach(({ el, text }) => {
   el.addEventListener('mouseenter', () => {
-    hintBar.textContent = text;
-    hintBar.classList.add('visible');
+    clearTimeout(hintTimeout);
+    hintBar.classList.remove('visible');
+    hintTimeout = setTimeout(() => {
+      hintBar.textContent = text;
+      hintBar.classList.add('visible');
+    }, 180); // 150ms fade-out + 30ms buffer
   });
   el.addEventListener('mouseleave', () => {
+    clearTimeout(hintTimeout);
     hintBar.classList.remove('visible');
   });
 });

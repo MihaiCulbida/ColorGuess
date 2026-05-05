@@ -900,7 +900,7 @@ input.vr::-moz-range-thumb {
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.01em;
   opacity: 0;
-  transition: opacity 500ms ease;
+  transition: opacity 150ms ease;
   pointer-events: none;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -911,5 +911,5 @@ input.vr::-moz-range-thumb {
 
 .hint-bar.visible {
   opacity: 1;
-  transition: opacity 500ms ease 300ms;
+  transition: opacity 500ms ease;
 }/*# sourceMappingURL=style.css.map */
