@@ -741,10 +741,16 @@ hintMap.forEach(({ el, text }) => {
     hintTimeout = setTimeout(() => {
       hintBar.textContent = text;
       hintBar.classList.add('visible');
-    }, 180); // 150ms fade-out + 30ms buffer
+    }, 180);
   });
   el.addEventListener('mouseleave', () => {
     clearTimeout(hintTimeout);
     hintBar.classList.remove('visible');
   });
+});
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const icon = document.getElementById('themeIcon');
+  const isDark = document.body.classList.toggle('dark-bg');
+  icon.src = isDark ? 'img/light.png' : 'img/dark.png';
 });
