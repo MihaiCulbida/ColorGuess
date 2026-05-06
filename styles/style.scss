@@ -11,6 +11,7 @@ body {
   justify-content: center;
   background: #fff;
   font-family: 'DM Sans', system-ui, sans-serif;
+  transition: background 0.6s ease;
 }
 
 .navbar {
@@ -33,6 +34,7 @@ body {
   letter-spacing: -0.5px;
   color: #000;
   user-select: none;
+  transition: color 0.6s ease;
 }
 
 .nav-right {
@@ -48,9 +50,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
   cursor: pointer;
   margin-top: 10px;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+  transition: filter 0.6s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
 
   &:hover {
     transform: scale(1.15);
@@ -68,6 +71,11 @@ body {
     height: 25px;
     object-fit: contain;
   }
+}
+
+#helpBtn img {
+  width: 34px;
+  height: 34px; 
 }
 
 .card {
@@ -948,4 +956,22 @@ input.vr::-moz-range-thumb {
 .hint-bar.visible {
   opacity: 1;
   transition: opacity 500ms ease;
+}
+
+body.dark-bg {
+  background: #111;
+}
+
+body.dark-bg .navbar .nav-title {
+  color: #fff;
+}
+
+body.dark-bg .nav-btn img {
+  filter: invert(1);
+}
+
+body.no-transition,
+body.no-transition .nav-title,
+body.no-transition .nav-btn img {
+  transition: none !important;
 }

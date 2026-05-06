@@ -749,8 +749,19 @@ hintMap.forEach(({ el, text }) => {
   });
 });
 
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.body.classList.add('no-transition');
+  document.body.classList.add('dark-bg');
+  document.getElementById('themeIcon').src = 'img/light.png';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.body.classList.remove('no-transition');
+  }));
+}
+
 document.getElementById('themeBtn').addEventListener('click', () => {
   const icon = document.getElementById('themeIcon');
   const isDark = document.body.classList.toggle('dark-bg');
   icon.src = isDark ? 'img/light.png' : 'img/dark.png';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
