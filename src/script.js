@@ -98,6 +98,8 @@ let gameTotalAttempts = null;
 let gameResultNextAction = null;
 let roundScores = [];
 let roundColors = [];
+let isSubmitting = false;
+let isGameRunning = false;
 
 function getScorePhrase(score) {
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -201,6 +203,8 @@ async function showColorRound(duration) {
 }
 
 document.getElementById('startBtn').addEventListener('click', async () => {
+  if (isGameRunning) return;
+  isGameRunning = true;
   cardTop.style.transition = 'opacity 0.35s ease';
   cardFooter.style.transition = 'opacity 0.35s ease';
   cardTop.style.opacity = '0';
@@ -522,11 +526,14 @@ function showResultScreen(original, guess, showPhrase) {
 
   card.style.transition = 'background 0.4s ease';
   card.style.background = '#0c0c0e';
+  isSubmitting = false;
 }
 
 const submitBtn = document.getElementById('submitBtn');
 
 submitBtn.addEventListener('click', () => {
+  if (isSubmitting) return;
+  isSubmitting = true;
   const guess = vals();
 
   if (currentGameColor) {
@@ -546,13 +553,16 @@ submitBtn.addEventListener('click', () => {
 });
 
 document.getElementById('resultNextBtn').addEventListener('click', async () => {
+  if (isSubmitting) return;
+  isSubmitting = true;
+
   const panel = document.getElementById('resultPanel');
   panel.style.opacity = '0';
-
   await sleep(400);
   panel.style.display = 'none';
 
   if (gameResultNextAction === 'training') {
+    isSubmitting = false;
     startTraining();
   } else if (gameResultNextAction === 'next') {
     currentRound++;
@@ -562,11 +572,13 @@ document.getElementById('resultNextBtn').addEventListener('click', async () => {
     roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
     roundCounter.style.zIndex = '10';
     requestAnimationFrame(() => { roundCounter.style.transition = ''; });
+    isSubmitting = false;
     await showCountdownWord('ready', hslStr(randomHSL()));
     await showCountdownWord('set', hslStr(randomHSL()));
     await showCountdownWord('go', hslStr(randomHSL()));
     await showColorRound(DURATIONS[currentDifficulty]);
   } else if (gameResultNextAction === 'end') {
+    isSubmitting = false;
     showSummaryScreen();
   }
 });
@@ -600,6 +612,7 @@ function showSummaryScreen() {
   closeBtn.className = 'summary-close-btn';
   closeBtn.innerHTML = '<img src="img/close.png">';
   const resetOverlay = () => {
+    isGameRunning = false;
     panel.style.opacity = '0';
     setTimeout(() => {
       panel.remove();
@@ -665,6 +678,7 @@ function showSummaryScreen() {
   playAgainBtn.className = 'summary-play-again-btn';
   playAgainBtn.textContent = 'Play again';
   playAgainBtn.addEventListener('click', async () => {
+  isGameRunning = false
   panel.style.opacity = '0';
   await sleep(400);
   panel.remove();
