@@ -124,6 +124,82 @@
         </label>
     </div>
 
+    <div class="help-overlay" id="helpOverlay">
+  <div class="help-modal" id="helpModal">
+    <button class="help-close-btn" id="helpCloseBtn">
+      <img src="img/close.png" alt="Close">
+    </button>
+    <div class="help-pages" id="helpPages">
+
+      <div class="help-page active" data-page="0">
+        <span class="help-page-label">01 / 03</span>
+        <h2 class="help-heading">How it works</h2>
+        <p class="help-body">A color fills the screen for a few seconds. Memorize it. When it disappears, use the three sliders to recreate it as accurately as you can.</p>
+        <p class="help-body">The sliders control <strong>Hue</strong>, <strong>Saturation</strong>, and <strong>Brightness</strong>. Drag them up or down to mix your color, then hit the submit button when you're ready.</p>
+        <div class="help-color-demo" id="helpColorDemo">
+          <div class="help-demo-original"></div>
+          <div class="help-demo-divider"></div>
+          <div class="help-demo-guess"></div>
+          <span class="help-demo-label help-demo-label--left">original</span>
+          <span class="help-demo-label help-demo-label--right">your guess</span>
+        </div>
+        <p class="help-body secondary">Each game runs from 1 to 10 rounds, or limitless. Your score from each round is added to a total shown at the end.</p>
+      </div>
+
+      <div class="help-page" data-page="1">
+        <span class="help-page-label">02 / 03</span>
+        <h2 class="help-heading">Difficulty</h2>
+        <p class="help-body">Difficulty controls how long the color is shown before it disappears.</p>
+        <div class="help-difficulty-grid">
+          <div class="help-diff-row">
+            <span class="help-diff-name">Easy</span>
+            <span class="help-diff-time">5 seconds</span>
+            <span class="help-diff-desc">Enough time to really look.</span>
+          </div>
+          <div class="help-diff-row">
+            <span class="help-diff-name">Medium</span>
+            <span class="help-diff-time">3 seconds</span>
+            <span class="help-diff-desc">You'll need to focus.</span>
+          </div>
+          <div class="help-diff-row">
+            <span class="help-diff-name">Hard</span>
+            <span class="help-diff-time">1 second</span>
+            <span class="help-diff-desc">Blink and it's gone.</span>
+          </div>
+        </div>
+        <p class="help-body" style="margin-top: 20px;">The color shown is always randomly generated — hue is completely random, while saturation and brightness are kept in a visible mid-range so nothing is too dark or too washed out.</p>
+      </div>
+
+      <div class="help-page" data-page="2">
+        <span class="help-page-label">03 / 03</span>
+        <h2 class="help-heading">Scoring</h2>
+        <p class="help-body">Each round is scored 0–10. Colors are compared using <strong>CIEDE2000</strong> — a color science formula that measures how different two colors actually look to the human eye, not just how far apart their values are.</p>
+        <div class="help-score-grid">
+          <div class="help-score-row"><span class="help-score-val high">9–10</span><span class="help-score-desc">Near perfect. Basically the same color.</span></div>
+          <div class="help-score-row"><span class="help-score-val mid">6–8</span><span class="help-score-desc">Right family, off on shade or saturation.</span></div>
+          <div class="help-score-row"><span class="help-score-val low">3–5</span><span class="help-score-desc">In the ballpark but visibly different.</span></div>
+          <div class="help-score-row"><span class="help-score-val bad">0–2</span><span class="help-score-desc">Wrong color entirely.</span></div>
+        </div>
+        <p class="help-body secondary" style="margin-top: 20px;">Getting the hue right — the color family — matters most. Nail the hue and you recover points even if brightness or saturation are off. On grays, hue doesn't count.</p>
+      </div>
+
+    </div>
+        <div class="help-nav">
+      <button class="help-nav-btn icon-btn" id="helpBackBtn">
+        <img src="img/arrow-left.png" alt="Back">
+      </button>
+      <div class="help-dots" id="helpDots">
+        <span class="help-dot active"></span>
+        <span class="help-dot"></span>
+        <span class="help-dot"></span>
+      </div>
+      <button class="help-nav-btn icon-btn primary" id="helpNextBtn">
+        <img src="img/arrow-right.png" alt="Next">
+      </button>
+    </div>
+  </div>
+</div>
+
     <script src="src/script.js"></script>
 </body>
 </html>

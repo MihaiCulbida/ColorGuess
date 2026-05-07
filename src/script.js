@@ -855,3 +855,59 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   icon.src = isDark ? 'img/light.png' : 'img/dark.png';
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
+
+const helpOverlay = document.getElementById('helpOverlay');
+const helpPages = document.querySelectorAll('.help-page');
+const helpDots = document.querySelectorAll('.help-dot');
+const helpNextBtn = document.getElementById('helpNextBtn');
+const helpBackBtn = document.getElementById('helpBackBtn');
+let helpCurrentPage = 0;
+
+function goToHelpPage(index, direction = 'forward') {
+  helpPages[helpCurrentPage].classList.remove('active', 'back');
+  helpCurrentPage = index;
+  const page = helpPages[helpCurrentPage];
+  if (direction === 'back') page.classList.add('back');
+  else page.classList.remove('back');
+  page.classList.add('active');
+
+  helpDots.forEach((d, i) => d.classList.toggle('active', i === helpCurrentPage));
+  helpBackBtn.disabled = helpCurrentPage === 0;
+
+  const isLast = helpCurrentPage === helpPages.length - 1;
+  helpNextBtn.classList.toggle('got-it', isLast);
+  helpNextBtn.innerHTML = isLast ? 'Got it' : '<img src="img/arrow-right.png" alt="Next">';
+}
+
+document.getElementById('helpBtn').addEventListener('click', () => {
+  helpCurrentPage = 0;
+  helpPages.forEach(p => p.classList.remove('active', 'back'));
+  helpPages[0].classList.add('active');
+  helpDots.forEach((d, i) => d.classList.toggle('active', i === 0));
+  helpBackBtn.disabled = true;
+  helpNextBtn.classList.remove('got-it');
+  helpNextBtn.innerHTML = '<img src="img/arrow-right.png" alt="Next">';
+  helpOverlay.classList.add('visible');
+});
+
+function closeHelp() {
+  helpOverlay.classList.remove('visible');
+}
+
+document.getElementById('helpCloseBtn').addEventListener('click', closeHelp);
+
+helpOverlay.addEventListener('click', (e) => {
+  if (e.target === helpOverlay) closeHelp();
+});
+
+helpNextBtn.addEventListener('click', () => {
+  if (helpCurrentPage < helpPages.length - 1) {
+    goToHelpPage(helpCurrentPage + 1, 'forward');
+  } else {
+    closeHelp();
+  }
+});
+
+helpBackBtn.addEventListener('click', () => {
+  if (helpCurrentPage > 0) goToHelpPage(helpCurrentPage - 1, 'back');
+});
