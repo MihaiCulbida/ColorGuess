@@ -444,7 +444,7 @@ function getAdaptiveColor(h, s, l, opacity = 1) {
   }
 }
 
-function animateScore(targetScore) {
+function animateScore(targetScore, onComplete) {
   const el = document.getElementById('resultScore');
   const duration = 800;
   const start = performance.now();
@@ -455,7 +455,10 @@ function animateScore(targetScore) {
     const current = eased * targetScore;
     el.textContent = current.toFixed(2);
     if (progress < 1) requestAnimationFrame(tick);
-    else el.textContent = targetScore.toFixed(2);
+    else {
+      el.textContent = targetScore.toFixed(2);
+      if (onComplete) onComplete();
+    }
   }
 
   requestAnimationFrame(tick);
@@ -481,6 +484,8 @@ function showResultScreen(original, guess, showPhrase) {
   const phraseEl = document.getElementById('resultScorePhrase');
   if (showPhrase) {
     phraseEl.textContent = getScorePhrase(score);
+    phraseEl.style.opacity = '0';
+    phraseEl.style.transform = 'translateY(-8px)';
     phraseEl.style.display = 'block';
   } else {
     phraseEl.style.display = 'none';
@@ -507,7 +512,10 @@ function showResultScreen(original, guess, showPhrase) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     panel.style.opacity = '1';
   }));
-  setTimeout(() => animateScore(score), 400);
+   setTimeout(() => animateScore(score, () => {
+    phraseEl.style.opacity = '1';
+    phraseEl.style.transform = 'translateY(0)';
+  }), 400);
   hslPanel.style.display = 'none';
   document.getElementById('toggleViewBtn').style.display = 'none';
   document.getElementById('submitBtn').style.display = 'none';

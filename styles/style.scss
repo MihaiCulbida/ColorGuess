@@ -797,6 +797,8 @@ input.vr::-moz-range-thumb {
   margin-top: 4px;
   display: block;
   user-select: none;
+  transition: opacity 0.5s ease, transform 0.8s ease;
+  transform: translateY(-8px);
 }
 
 #summaryPanel {

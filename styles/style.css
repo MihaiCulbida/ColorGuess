@@ -830,6 +830,8 @@ input.vr::-moz-range-thumb {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  transition: opacity 0.5s ease, transform 0.8s ease;
+  transform: translateY(-8px);
 }
 
 #summaryPanel {
