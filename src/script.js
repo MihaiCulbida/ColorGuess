@@ -3,6 +3,7 @@ const sfx = (() => {
   const get = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
 
   function tone(freq, type, attack, sustain, release, gain = 0.18) {
+    if (muted) return;
     const ac = get();
     const osc = ac.createOscillator();
     const env = ac.createGain();
@@ -19,6 +20,7 @@ const sfx = (() => {
   }
 
   function noise(duration, gain = 0.06) {
+    if (muted) return;
     const ac = get();
     const buf = ac.createBuffer(1, ac.sampleRate * duration, ac.sampleRate);
     const data = buf.getChannelData(0);
@@ -1002,4 +1004,10 @@ helpNextBtn.addEventListener('click', () => {
 helpBackBtn.addEventListener('click', () => {
   sfx.click();
   if (helpCurrentPage > 0) goToHelpPage(helpCurrentPage - 1, 'back');
+});
+
+let muted = false;
+document.getElementById('muteBtn').addEventListener('click', () => {
+  muted = !muted;
+  document.getElementById('muteIcon').src = muted ? 'img/volume-slash.png' : 'img/volume.png';
 });
