@@ -50,8 +50,8 @@ const sfx = (() => {
 
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
-  const s = Math.floor(20 + Math.random() * 40);
-  const l = Math.floor(20 + Math.random() * 40);
+  const s = Math.floor(20 + Math.random() * 61);
+  const l = Math.floor(20 + Math.random() * 61);
   return { h, s, l };
 }
 
