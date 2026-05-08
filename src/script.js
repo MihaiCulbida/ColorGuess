@@ -1,7 +1,7 @@
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
-  const s = Math.floor(50 + Math.random() * 40);
-  const l = Math.floor(45 + Math.random() * 40);
+  const s = Math.floor(20 + Math.random() * 40);
+  const l = Math.floor(20 + Math.random() * 40);
   return { h, s, l };
 }
 
@@ -293,11 +293,7 @@ function update() {
 
 function updateCounterColor(h, s, l) {
   const roundCounter = document.getElementById('roundCounter');
-  if (l > 55) {
-    roundCounter.style.color = `hsla(${h},${Math.max(s-20,0)}%,25%,0.5)`;
-  } else {
-    roundCounter.style.color = `hsla(${h},${Math.max(s-20,0)}%,85%,0.5)`;
-  }
+  roundCounter.style.color = getAdaptiveColor(h, mapS(s), mapL(l), 0.5);
 }
 
 buildHueBg();
@@ -323,11 +319,7 @@ function showSliderLabel(text) {
   const { h, s, l } = vals();
   const cardL = mapL(l);
   const cardS = mapS(s);
-  if (cardL > 55) {
-    label.style.color = `hsla(${h},${Math.max(cardS-20,0)}%,25%,0.4)`;
-  } else {
-    label.style.color = `hsla(${h},${Math.max(cardS-20,0)}%,85%,0.4)`;
-  }
+  label.style.color = getAdaptiveColor(h, cardS, cardL, 0.4);
 }
 
 [hS, sS, lS].forEach(r => r.addEventListener('input', update));
@@ -441,11 +433,19 @@ function calcScore(orig, guess) {
 let trainingColor = null;
 
 function getAdaptiveColor(h, s, l, opacity = 1) {
-  if (l > 55) {
-    return `hsla(${h}, ${Math.max(s - 20, 0)}%, 15%, ${opacity})`;
-  } else {
-    return `hsla(${h}, ${Math.max(s - 20, 0)}%, 85%, ${opacity})`;
-  }
+  const sn = s / 100, ln = l / 100;
+  const c = (1 - Math.abs(2 * ln - 1)) * sn;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = ln - c / 2;
+  const hi = Math.floor(h / 60) % 6;
+  const rgb = [[c,x,0],[x,c,0],[0,c,x],[0,x,c],[x,0,c],[c,0,x]][hi];
+  const [r, g, b] = rgb.map(v => {
+    const lin = v + m;
+    return lin <= 0.04045 ? lin / 12.92 : Math.pow((lin + 0.055) / 1.055, 2.4);
+  });
+  const perceived = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const dark = perceived > 0.179;
+  return `hsla(${h}, ${Math.max(s - 20, 0)}%, ${dark ? 15 : 85}%, ${opacity})`;
 }
 
 function animateScore(targetScore, onComplete) {
@@ -788,9 +788,16 @@ const toggleViewBtn = document.getElementById('toggleViewBtn');
 let showingAnswer = false;
 
 function updateGameBtnColors(h, s, l) {
-  const adaptive = getAdaptiveColor(h, s, l, 0.12);
-  const adaptiveBorder = getAdaptiveColor(h, s, l, 0.18);
-  const imgFilter = l > 55 ? 'invert(0)' : 'invert(1)';
+  const adaptive = getAdaptiveColor(h, mapS(s), mapL(l), 0.12);
+  const adaptiveBorder = getAdaptiveColor(h, mapS(s), mapL(l), 0.18);
+  const perceived = (() => {
+    const cardS = mapS(s), cardL = mapL(l);
+    const sn = cardS/100, ln = cardL/100;
+    const c = (1-Math.abs(2*ln-1))*sn, x = c*(1-Math.abs((h/60)%2-1)), m = ln-c/2;
+    const [r,g,b] = [[c,x,0],[x,c,0],[0,c,x],[0,x,c],[x,0,c],[c,0,x]][Math.floor(h/60)%6].map(v=>{const lin=v+m;return lin<=0.04045?lin/12.92:Math.pow((lin+0.055)/1.055,2.4);});
+    return 0.2126*r+0.7152*g+0.0722*b;
+  })();
+  const imgFilter = perceived > 0.179 ? 'invert(0)' : 'invert(1)';
   const toggleBtn = document.getElementById('toggleViewBtn');
   toggleBtn.style.background = adaptive;
   toggleBtn.style.borderColor = adaptiveBorder;
