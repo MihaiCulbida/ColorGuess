@@ -1,3 +1,51 @@
+const sfx = (() => {
+  let ctx = null;
+  const get = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
+
+  function tone(freq, type, attack, sustain, release, gain = 0.18) {
+    const ac = get();
+    const osc = ac.createOscillator();
+    const env = ac.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ac.currentTime);
+    env.gain.setValueAtTime(0, ac.currentTime);
+    env.gain.linearRampToValueAtTime(gain, ac.currentTime + attack);
+    env.gain.setValueAtTime(gain, ac.currentTime + attack + sustain);
+    env.gain.linearRampToValueAtTime(0, ac.currentTime + attack + sustain + release);
+    osc.connect(env);
+    env.connect(ac.destination);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + attack + sustain + release + 0.01);
+  }
+
+  function noise(duration, gain = 0.06) {
+    const ac = get();
+    const buf = ac.createBuffer(1, ac.sampleRate * duration, ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const env = ac.createGain();
+    env.gain.setValueAtTime(gain, ac.currentTime);
+    env.gain.linearRampToValueAtTime(0, ac.currentTime + duration);
+    src.connect(env);
+    env.connect(ac.destination);
+    src.start();
+    src.stop(ac.currentTime + duration);
+  }
+
+  return {
+    hover: () => tone(200, 'sine', 0.005, 0.04, 0.08, 0.07),
+    click: () => tone(240, 'sine', 0.003, 0.02, 0.06, 0.10),
+    ready: () => tone(330, 'triangle', 0.01, 0.08, 0.15, 0.15),
+    set: () => tone(440, 'triangle', 0.01, 0.08, 0.15, 0.15),
+    go: () => tone(660, 'triangle', 0.01, 0.10, 0.20, 0.20),
+    tick: () => tone(220, 'sine', 0.005, 0.01, 0.05, 0.08),
+    score: (p) => tone(200 + p * 600, 'sine', 0.005, 0.01, 0.04, 0.10),
+    submit: () => { tone(420, 'sine', 0.005, 0.05, 0.10, 0.12); noise(0.08, 0.04); },
+  };
+})();
+
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
   const s = Math.floor(20 + Math.random() * 40);
@@ -84,6 +132,10 @@ async function showCountdownWord(text, color) {
   const [h, s, l] = color.match(/\d+/g).map(Number);
   updateCounterColor(h, s, l);
 
+  if (text === 'ready') sfx.ready();
+  else if (text === 'set') sfx.set();
+  else if (text === 'go') sfx.go();
+
   const el = document.getElementById('countdownWord');
   el.textContent = text;
   el.classList.add('visible');
@@ -166,7 +218,7 @@ async function showColorRound(duration) {
     const remaining = Math.max(0, duration - elapsed);
     const secs = Math.floor(remaining / 1000);
     const ms = Math.floor((remaining % 1000) / 10);
-    if (secs !== lastSec) { lastSec = secs; animateSecondChange(secs); }
+    if (secs !== lastSec) { lastSec = secs; animateSecondChange(secs); sfx.tick(); }
     timerMillis.textContent = ms.toString().padStart(2, '0');
     if (remaining > 0) rafId = requestAnimationFrame(tick);
   }
@@ -453,11 +505,14 @@ function animateScore(targetScore, onComplete) {
   const duration = 800;
   const start = performance.now();
 
+  let lastSoundAt = -1;
   function tick(now) {
     const progress = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     const current = eased * targetScore;
     el.textContent = current.toFixed(2);
+    const soundStep = Math.floor(progress * 8);
+    if (soundStep !== lastSoundAt) { lastSoundAt = soundStep; sfx.score(eased); }
     if (progress < 1) requestAnimationFrame(tick);
     else {
       el.textContent = targetScore.toFixed(2);
@@ -533,6 +588,7 @@ const submitBtn = document.getElementById('submitBtn');
 
 submitBtn.addEventListener('click', () => {
   if (isSubmitting) return;
+  sfx.submit();
   isSubmitting = true;
   const guess = vals();
 
@@ -554,6 +610,7 @@ submitBtn.addEventListener('click', () => {
 
 document.getElementById('resultNextBtn').addEventListener('click', async () => {
   if (isSubmitting) return;
+  sfx.click();
   isSubmitting = true;
 
   const panel = document.getElementById('resultPanel');
@@ -855,6 +912,7 @@ let hintTimeout = null;
 
 hintMap.forEach(({ el, text }) => {
   el.addEventListener('mouseenter', () => {
+    sfx.hover();
     clearTimeout(hintTimeout);
     hintBar.classList.remove('visible');
     hintTimeout = setTimeout(() => {
@@ -866,6 +924,7 @@ hintMap.forEach(({ el, text }) => {
     clearTimeout(hintTimeout);
     hintBar.classList.remove('visible');
   });
+  el.addEventListener('click', () => sfx.click());
 });
 
 const savedTheme = localStorage.getItem('theme');
@@ -879,6 +938,7 @@ if (savedTheme === 'dark') {
 }
 
 document.getElementById('themeBtn').addEventListener('click', () => {
+  sfx.click();
   const icon = document.getElementById('themeIcon');
   const isDark = document.body.classList.toggle('dark-bg');
   icon.src = isDark ? 'img/light.png' : 'img/dark.png';
@@ -909,6 +969,7 @@ function goToHelpPage(index, direction = 'forward') {
 }
 
 document.getElementById('helpBtn').addEventListener('click', () => {
+  sfx.click();
   helpCurrentPage = 0;
   helpPages.forEach(p => p.classList.remove('active', 'back'));
   helpPages[0].classList.add('active');
@@ -923,13 +984,14 @@ function closeHelp() {
   helpOverlay.classList.remove('visible');
 }
 
-document.getElementById('helpCloseBtn').addEventListener('click', closeHelp);
+document.getElementById('helpCloseBtn').addEventListener('click', () => { sfx.click(); closeHelp(); });
 
 helpOverlay.addEventListener('click', (e) => {
   if (e.target === helpOverlay) closeHelp();
 });
 
 helpNextBtn.addEventListener('click', () => {
+  sfx.click();
   if (helpCurrentPage < helpPages.length - 1) {
     goToHelpPage(helpCurrentPage + 1, 'forward');
   } else {
@@ -938,5 +1000,6 @@ helpNextBtn.addEventListener('click', () => {
 });
 
 helpBackBtn.addEventListener('click', () => {
+  sfx.click();
   if (helpCurrentPage > 0) goToHelpPage(helpCurrentPage - 1, 'back');
 });
