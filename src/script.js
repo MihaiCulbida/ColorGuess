@@ -1,7 +1,7 @@
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
-  const s = Math.floor(50 + Math.random() * 30);
-  const l = Math.floor(45 + Math.random() * 20);
+  const s = Math.floor(50 + Math.random() * 40);
+  const l = Math.floor(45 + Math.random() * 40);
   return { h, s, l };
 }
 
