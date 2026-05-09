@@ -28,6 +28,9 @@
     <div class="card">
         <div class="card-top">
             <h1 class="title">color</h1>
+            <button class="records-icon-btn" id="recordsBtn">
+              <img src="img/records.png" alt="Records">
+            </button>
             <div class="description-block">
                 <p class="description">A color appears. You name it.</p>
                 <p class="description secondary">Most people can't remember colors anymore.<br>See how good (or bad) you are at it.</p>
@@ -112,6 +115,23 @@
                     </button>
                 </div>
             </div>
+            <div class="records-panel" id="recordsPanel" style="display:none; opacity:0;">
+              <div class="records-toast" id="recordsToast"></div>
+              <div class="records-inner">
+                <button class="records-back-btn" id="recordsBackBtn">
+                  <img src="img/close.png" alt="Close">
+                </button>
+                <div class="records-tabs-row" id="recordsTabsRow"></div>
+                <div class="records-list" id="recordsList"></div>
+              </div>
+              <div class="records-delete-confirm" id="recordsDeleteConfirm" style="display:none;">
+                <p class="records-delete-msg">Delete this record?</p>
+                <div class="records-delete-actions">
+                  <button class="records-delete-yes" id="recordsDeleteYes">Delete</button>
+                  <button class="records-delete-no" id="recordsDeleteNo">Cancel</button>
+                </div>
+              </div>
+            </div>
         </div>
     </div>
 
@@ -127,7 +147,7 @@
         </label>
     </div>
 
-    <div class="help-overlay" id="helpOverlay">
+<div class="help-overlay" id="helpOverlay">
   <div class="help-modal" id="helpModal">
     <button class="help-close-btn" id="helpCloseBtn">
       <img src="img/close.png" alt="Close">

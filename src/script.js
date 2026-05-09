@@ -667,6 +667,21 @@ function showSummaryScreen() {
   const panel = document.createElement('div');
   panel.id = 'summaryPanel';
 
+  const summaryToast = document.createElement('div');
+  summaryToast.className = 'records-toast';
+  summaryToast.id = 'summaryToast';
+  panel.appendChild(summaryToast);
+
+  let summaryToastTimer = null;
+  function showSummaryToast(msg, type) {
+    const t = document.getElementById('summaryToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'records-toast visible ' + type;
+    clearTimeout(summaryToastTimer);
+    summaryToastTimer = setTimeout(() => { t.className = 'records-toast'; }, 3000);
+  }
+
   const closeBtn = document.createElement('button');
   closeBtn.className = 'summary-close-btn';
   closeBtn.innerHTML = '<img src="img/close.png">';
@@ -708,6 +723,9 @@ function showSummaryScreen() {
   const colorsGrid = document.createElement('div');
   colorsGrid.className = 'summary-colors-grid';
   const cellSize = 72;
+  const isSingleRow = roundColors.length <= 5;
+  colorsGrid.style.marginTop = isSingleRow ? 'auto' : '20px';
+  colorsGrid.style.marginBottom = isSingleRow ? 'auto' : '0';
 
   roundColors.forEach((entry, i) => {
     const cell = document.createElement('div');
@@ -737,49 +755,91 @@ function showSummaryScreen() {
   playAgainBtn.className = 'summary-play-again-btn';
   playAgainBtn.textContent = 'Play again';
   playAgainBtn.addEventListener('click', async () => {
-  isGameRunning = false
-  panel.style.opacity = '0';
-  await sleep(400);
-  panel.remove();
-  overlay.style.display = 'none';
+    isGameRunning = false;
+    panel.style.opacity = '0';
+    await sleep(400);
+    panel.remove();
+    overlay.style.display = 'none';
 
-  const roundCounter = document.getElementById('roundCounter');
-  roundCounter.textContent = '';
-  roundCounter.classList.remove('shifted');
-  roundCounter.style.zIndex = '10';
-  card.style.transition = 'background 0.4s ease';
-  card.style.background = '#0c0c0e';
-  cardTop.style.display = 'flex';
-  cardFooter.style.display = 'flex';
+    const roundCounter = document.getElementById('roundCounter');
+    roundCounter.textContent = '';
+    roundCounter.classList.remove('shifted');
+    roundCounter.style.zIndex = '10';
+    card.style.transition = 'background 0.4s ease';
+    card.style.background = '#0c0c0e';
+    cardTop.style.display = 'flex';
+    cardFooter.style.display = 'flex';
 
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  cardTop.style.opacity = '1';
-  cardFooter.style.opacity = '1';
-  await sleep(350);
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    cardTop.style.opacity = '1';
+    cardFooter.style.opacity = '1';
+    await sleep(350);
 
-  currentRound = 1;
-  roundScores = [];
-  roundColors = [];
-  roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
+    currentRound = 1;
+    roundScores = [];
+    roundColors = [];
+    roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
 
-  cardTop.style.opacity = '0';
-  cardFooter.style.opacity = '0';
-  await sleep(350);
-  cardTop.style.display = 'none';
-  cardFooter.style.display = 'none';
+    cardTop.style.opacity = '0';
+    cardFooter.style.opacity = '0';
+    await sleep(350);
+    cardTop.style.display = 'none';
+    cardFooter.style.display = 'none';
 
-  overlay.style.display = 'flex';
-  await showCountdownWord('ready', hslStr(randomHSL()));
-  await showCountdownWord('set', hslStr(randomHSL()));
-  await showCountdownWord('go', hslStr(randomHSL()));
-  await showColorRound(DURATIONS[currentDifficulty]);
-});
+    overlay.style.display = 'flex';
+    await showCountdownWord('ready', hslStr(randomHSL()));
+    await showCountdownWord('set', hslStr(randomHSL()));
+    await showCountdownWord('go', hslStr(randomHSL()));
+    await showColorRound(DURATIONS[currentDifficulty]);
+  });
+
+  const saveRow = document.createElement('div');
+  saveRow.className = 'summary-save-row';
+
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.maxLength = 3;
+  nameInput.placeholder = 'AAA';
+  nameInput.className = 'summary-name-pill';
+  nameInput.addEventListener('input', () => {
+    nameInput.value = nameInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+  });
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'summary-save-btn';
+  saveBtn.textContent = 'Save the record';
+  saveBtn.addEventListener('click', () => {
+    const raw = nameInput.value.trim();
+    if (raw.length < 3) { showSummaryToast('Enter exactly 3 letters', 'error'); return; }
+    if (!/^[A-Z]{3}$/.test(raw)) { showSummaryToast('Letters only — no numbers or symbols', 'error'); return; }
+    const records = loadRecords();
+    if (records.find(r => r.name === raw && r.difficulty === currentDifficulty)) { showSummaryToast('Name already used', 'error'); return; }
+    const entry = {
+      id: Date.now() + Math.random(),
+      name: raw,
+      score: total,
+      attempts: gameTotalAttempts === null ? 0 : gameTotalAttempts,
+      rounds: roundScores.length,
+      difficulty: currentDifficulty,
+      date: new Date().toISOString()
+    };
+    records.push(entry);
+    saveRecordsLS(records);
+    nameInput.disabled = true;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saved';
+    showSummaryToast('Saved', 'success');
+  });
+
+  saveRow.appendChild(nameInput);
+  saveRow.appendChild(saveBtn);
 
   panel.appendChild(closeBtn);
   panel.appendChild(scoreRow);
   panel.appendChild(phraseEl);
   panel.appendChild(colorsGrid);
   panel.appendChild(playAgainBtn);
+  panel.appendChild(saveRow);
   overlay.appendChild(panel);
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1010,4 +1070,159 @@ let muted = false;
 document.getElementById('muteBtn').addEventListener('click', () => {
   muted = !muted;
   document.getElementById('muteIcon').src = muted ? 'img/volume-slash.png' : 'img/volume.png';
+});
+
+const RECORDS_KEY = 'colormatch_records';
+function loadRecords() { try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch { return []; } }
+function saveRecordsLS(arr) { localStorage.setItem(RECORDS_KEY, JSON.stringify(arr)); }
+
+const DIFF_LABELS = { 0: 'Easy', 1: 'Medium', 2: 'Hard' };
+const DIFF_KEYS = [0, 1, 2];
+
+let recordsPendingDeleteId = null;
+let recordsActiveTab = 0;
+let recordsToastTimer = null;
+
+function showRecordsToast(msg, type) {
+  const t = document.getElementById('recordsToast');
+  t.textContent = msg;
+  t.className = 'records-toast visible ' + type;
+  clearTimeout(recordsToastTimer);
+  recordsToastTimer = setTimeout(() => { t.className = 'records-toast'; }, 3000);
+}
+
+function openRecordsPanel() {
+  sfx.click();
+  document.getElementById('gameOverlay').style.display = 'flex';
+  hslPanel.style.display = 'none';
+  submitBtn.style.display = 'none';
+  document.getElementById('toggleViewBtn').style.display = 'none';
+  document.getElementById('resultPanel').style.display = 'none';
+
+  const records = loadRecords();
+  const usedDiffs = DIFF_KEYS.filter(d => records.some(r => r.difficulty === d));
+  recordsActiveTab = usedDiffs.length ? usedDiffs[0] : 0;
+
+  renderRecordsPanel();
+  const panel = document.getElementById('recordsPanel');
+  panel.style.display = 'flex';
+  panel.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.opacity = '1'; }));
+}
+
+function closeRecordsPanel() {
+  const panel = document.getElementById('recordsPanel');
+  panel.style.opacity = '0';
+  setTimeout(() => { panel.style.display = 'none'; }, 350);
+  if (!isGameRunning) document.getElementById('gameOverlay').style.display = 'none';
+}
+
+function renderRecordsPanel() {
+  const records = loadRecords();
+  const tabsRow = document.getElementById('recordsTabsRow');
+  const list = document.getElementById('recordsList');
+
+  const usedDiffs = DIFF_KEYS.filter(d => records.some(r => r.difficulty === d));
+
+  tabsRow.innerHTML = '';
+  usedDiffs.forEach(d => {
+    const tab = document.createElement('button');
+    tab.className = 'records-tab' + (recordsActiveTab === d ? ' active' : '');
+    tab.textContent = DIFF_LABELS[d];
+    tab.addEventListener('click', () => { recordsActiveTab = d; renderRecordsPanel(); });
+    tabsRow.appendChild(tab);
+  });
+
+  list.innerHTML = '';
+
+  const filtered = records.filter(r => r.difficulty === recordsActiveTab);
+
+  if (!filtered.length) {
+    const empty = document.createElement('p');
+    empty.className = 'records-empty';
+    empty.textContent = 'No records yet.';
+    list.appendChild(empty);
+    return;
+  }
+
+  const attemptGroups = [...new Set(filtered.map(r => r.attempts))]
+    .sort((a, b) => {
+      if (a === 0) return 1;
+      if (b === 0) return -1;
+      return b - a;
+    });
+
+  attemptGroups.forEach(att => {
+    const group = filtered.filter(r => r.attempts === att).sort((a, b) => b.score - a.score);
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'records-attempts-group';
+
+    const label = document.createElement('span');
+    label.className = 'records-attempts-label';
+    label.textContent = att === 0 ? 'Limitless' : att === 1 ? '1 attempt' : att + ' attempts';
+    groupEl.appendChild(label);
+
+    group.forEach((rec, idx) => {
+      const row = document.createElement('div');
+      row.className = 'records-row';
+
+      const rank = document.createElement('span');
+      rank.className = 'records-row-rank';
+      rank.textContent = idx + 1;
+
+      const name = document.createElement('span');
+      name.className = 'records-row-name';
+      name.textContent = rec.name;
+
+      const score = document.createElement('span');
+      score.className = 'records-row-score';
+      const max = att === 0 ? rec.rounds : att;
+      score.textContent = rec.score.toFixed(2) + ' / ' + (max * 10);
+
+      const del = document.createElement('button');
+      del.className = 'records-row-del';
+      del.innerHTML = '<img src="img/close.png" alt="Delete">';
+      del.addEventListener('click', (e) => {
+        e.stopPropagation();
+        recordsPendingDeleteId = rec.id;
+        document.getElementById('recordsDeleteConfirm').style.display = 'flex';
+      });
+
+      row.appendChild(rank);
+      row.appendChild(name);
+      row.appendChild(score);
+      row.appendChild(del);
+      groupEl.appendChild(row);
+    });
+
+    list.appendChild(groupEl);
+  });
+}
+
+document.getElementById('recordsDeleteYes').addEventListener('click', () => {
+  if (recordsPendingDeleteId == null) return;
+  const all = loadRecords().filter(r => r.id !== recordsPendingDeleteId);
+  saveRecordsLS(all);
+  recordsPendingDeleteId = null;
+  document.getElementById('recordsDeleteConfirm').style.display = 'none';
+
+  const remaining = all.filter(r => r.difficulty === recordsActiveTab);
+  if (!remaining.length) {
+    const usedDiffs = DIFF_KEYS.filter(d => all.some(r => r.difficulty === d));
+    recordsActiveTab = usedDiffs.length ? usedDiffs[0] : 0;
+  }
+
+  renderRecordsPanel();
+});
+
+document.getElementById('recordsDeleteNo').addEventListener('click', () => {
+  recordsPendingDeleteId = null;
+  document.getElementById('recordsDeleteConfirm').style.display = 'none';
+});
+
+document.getElementById('recordsBtn').addEventListener('click', openRecordsPanel);
+document.getElementById('recordsBackBtn').addEventListener('click', () => {
+  sfx.click();
+  closeRecordsPanel();
 });
