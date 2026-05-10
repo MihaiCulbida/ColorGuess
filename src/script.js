@@ -1143,6 +1143,9 @@ function showRecordDetail(rec) {
 
   const colorsGrid = document.createElement('div');
   colorsGrid.className = 'record-detail-grid';
+  const cols = Math.min(rec.roundColors.length, 5);
+  colorsGrid.style.maxWidth = (5 * 80 + 4 * 6) + 'px';
+  colorsGrid.style.margin = '20px auto 0';
 
   const hasColors = rec.roundColors && rec.roundColors.length > 0;
   const hasScores = rec.roundScores && rec.roundScores.length > 0;
