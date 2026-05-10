@@ -970,6 +970,7 @@ const hintMap = [
   { el: document.getElementById('difficultyTrack'), text: 'Change the game difficulty.' },
   { el: document.getElementById('difficultyLabel'), text: 'Change the game difficulty.' },
   { el: document.getElementById('startBtn'), text: 'Start the game.' },
+  { el: document.getElementById('recordsBtn'), text: 'View your records.' }
 ];
 
 let hintTimeout = null;
