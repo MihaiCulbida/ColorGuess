@@ -1085,6 +1085,7 @@ const DIFF_KEYS = [0, 1, 2];
 let recordsPendingDeleteId = null;
 let recordsActiveTab = 0;
 let recordsToastTimer = null;
+let recordsSearchQuery = '';
 
 function showRecordsToast(msg, type) {
   const t = document.getElementById('recordsToast');
@@ -1153,7 +1154,7 @@ function showRecordDetail(rec) {
   if (hasColors) {
     rec.roundColors.forEach((entry, i) => {
       const cell = document.createElement('div');
-      cell.className = 'record-detail-cell'
+      cell.className = 'record-detail-cell';
 
       const origHalf = document.createElement('div');
       origHalf.style.cssText = `
@@ -1232,6 +1233,7 @@ function openRecordsPanel() {
   const records = loadRecords();
   const usedDiffs = DIFF_KEYS.filter(d => records.some(r => r.difficulty === d));
   recordsActiveTab = usedDiffs.length ? usedDiffs[0] : 0;
+  recordsSearchQuery = '';
 
   renderRecordsPanel();
   const panel = document.getElementById('recordsPanel');
@@ -1254,82 +1256,128 @@ function renderRecordsPanel() {
 
   const usedDiffs = DIFF_KEYS.filter(d => records.some(r => r.difficulty === d));
 
+  function renderFilteredList() {
+    const filtered = records
+      .filter(r => r.difficulty === recordsActiveTab)
+      .filter(r => !recordsSearchQuery || r.name.startsWith(recordsSearchQuery));
+
+    list.innerHTML = '';
+
+    if (!filtered.length) {
+      const empty = document.createElement('p');
+      empty.className = 'records-empty';
+      empty.textContent = recordsSearchQuery ? 'No records found.' : 'No records yet.';
+      list.appendChild(empty);
+      return;
+    }
+
+    const attemptGroups = [...new Set(filtered.map(r => r.attempts))]
+      .sort((a, b) => {
+        if (a === 0) return 1;
+        if (b === 0) return -1;
+        return b - a;
+      });
+
+    attemptGroups.forEach(att => {
+      const group = filtered.filter(r => r.attempts === att).sort((a, b) => b.score - a.score);
+
+      const groupEl = document.createElement('div');
+      groupEl.className = 'records-attempts-group';
+
+      const lbl = document.createElement('span');
+      lbl.className = 'records-attempts-label';
+      lbl.textContent = att === 0 ? 'Limitless' : att === 1 ? '1 attempt' : att + ' attempts';
+      groupEl.appendChild(lbl);
+
+      group.forEach((rec, idx) => {
+        const row = document.createElement('div');
+        row.className = 'records-row';
+        row.style.cursor = 'pointer';
+
+        const rank = document.createElement('span');
+        rank.className = 'records-row-rank';
+        rank.textContent = idx + 1;
+
+        const name = document.createElement('span');
+        name.className = 'records-row-name';
+        name.textContent = rec.name;
+
+        const score = document.createElement('span');
+        score.className = 'records-row-score';
+        const max = att === 0 ? rec.rounds : att;
+        score.textContent = rec.score.toFixed(2) + ' / ' + (max * 10);
+
+        const del = document.createElement('button');
+        del.className = 'records-row-del';
+        del.innerHTML = '<img src="img/close.png" alt="Delete">';
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          recordsPendingDeleteId = rec.id;
+          document.getElementById('recordsDeleteConfirm').style.display = 'flex';
+        });
+
+        row.addEventListener('click', () => showRecordDetail(rec));
+        row.appendChild(rank);
+        row.appendChild(name);
+        row.appendChild(score);
+        row.appendChild(del);
+        groupEl.appendChild(row);
+      });
+
+      list.appendChild(groupEl);
+    });
+  }
+
   tabsRow.innerHTML = '';
+
+  const searchBtn = document.createElement('button');
+  searchBtn.className = 'records-search-btn' + (recordsSearchQuery ? ' active' : '');
+  searchBtn.innerHTML = '<img src="img/search.png" alt="Search">';
+  
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.className = 'records-search-input' + (recordsSearchQuery ? ' visible' : '');
+  searchInput.placeholder = 'AAA';
+  searchInput.maxLength = 3;
+  searchInput.value = recordsSearchQuery;
+  searchInput.addEventListener('input', () => {
+    searchInput.value = searchInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+    recordsSearchQuery = searchInput.value;
+    renderFilteredList();
+  });
+  
+  searchBtn.addEventListener('click', () => {
+    const isVisible = searchInput.classList.toggle('visible');
+    searchBtn.classList.toggle('active', isVisible);
+    if (isVisible) {
+      setTimeout(() => searchInput.focus(), 50);
+    } else {
+      recordsSearchQuery = '';
+      searchInput.value = '';
+      renderFilteredList();
+    }
+  });
+  
+  const tabsLeft = document.createElement('div');
+  tabsLeft.className = 'records-tabs-left';
+
   usedDiffs.forEach(d => {
     const tab = document.createElement('button');
     tab.className = 'records-tab' + (recordsActiveTab === d ? ' active' : '');
     tab.textContent = DIFF_LABELS[d];
-    tab.addEventListener('click', () => { recordsActiveTab = d; renderRecordsPanel(); });
-    tabsRow.appendChild(tab);
+    tab.addEventListener('click', () => {
+      recordsActiveTab = d;
+      recordsSearchQuery = '';
+      renderRecordsPanel();
+    });
+    tabsLeft.appendChild(tab);
   });
 
-  list.innerHTML = '';
+  tabsRow.appendChild(tabsLeft);
+  tabsRow.appendChild(searchBtn);
+  tabsRow.appendChild(searchInput);
 
-  const filtered = records.filter(r => r.difficulty === recordsActiveTab);
-
-  if (!filtered.length) {
-    const empty = document.createElement('p');
-    empty.className = 'records-empty';
-    empty.textContent = 'No records yet.';
-    list.appendChild(empty);
-    return;
-  }
-
-  const attemptGroups = [...new Set(filtered.map(r => r.attempts))]
-    .sort((a, b) => {
-      if (a === 0) return 1;
-      if (b === 0) return -1;
-      return b - a;
-    });
-
-  attemptGroups.forEach(att => {
-    const group = filtered.filter(r => r.attempts === att).sort((a, b) => b.score - a.score);
-
-    const groupEl = document.createElement('div');
-    groupEl.className = 'records-attempts-group';
-
-    const label = document.createElement('span');
-    label.className = 'records-attempts-label';
-    label.textContent = att === 0 ? 'Limitless' : att === 1 ? '1 attempt' : att + ' attempts';
-    groupEl.appendChild(label);
-
-    group.forEach((rec, idx) => {
-      const row = document.createElement('div');
-      row.className = 'records-row';
-      row.style.cursor = 'pointer';
-
-      const rank = document.createElement('span');
-      rank.className = 'records-row-rank';
-      rank.textContent = idx + 1;
-
-      const name = document.createElement('span');
-      name.className = 'records-row-name';
-      name.textContent = rec.name;
-
-      const score = document.createElement('span');
-      score.className = 'records-row-score';
-      const max = att === 0 ? rec.rounds : att;
-      score.textContent = rec.score.toFixed(2) + ' / ' + (max * 10);
-
-      const del = document.createElement('button');
-      del.className = 'records-row-del';
-      del.innerHTML = '<img src="img/close.png" alt="Delete">';
-      del.addEventListener('click', (e) => {
-        e.stopPropagation();
-        recordsPendingDeleteId = rec.id;
-        document.getElementById('recordsDeleteConfirm').style.display = 'flex';
-      });
-
-      row.addEventListener('click', () => showRecordDetail(rec));
-      row.appendChild(rank);
-      row.appendChild(name);
-      row.appendChild(score);
-      row.appendChild(del);
-      groupEl.appendChild(row);
-    });
-
-    list.appendChild(groupEl);
-  });
+  renderFilteredList();
 }
 
 document.getElementById('recordsDeleteYes').addEventListener('click', () => {
