@@ -48,6 +48,24 @@ const sfx = (() => {
   };
 })();
 
+// ─── localStorage helpers ────────────────────────────────────────────────────
+const SETTINGS_KEY = 'colormatch_settings';
+
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSetting(key, value) {
+  const s = loadSettings();
+  s[key] = value;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
   const s = Math.floor(20 + Math.random() * 61);
@@ -64,13 +82,14 @@ const label = document.getElementById('difficultyLabel');
 const dots = document.querySelectorAll('.difficulty-dot');
 const THUMB_POSITIONS = [4, 21, 39];
 
-function setDifficulty(index) {
+function setDifficulty(index, persist = true) {
   currentDifficulty = index;
   thumb.style.left = THUMB_POSITIONS[index] + 'px';
   label.textContent = DIFFICULTIES[index];
   dots.forEach((dot, i) => {
     dot.style.opacity = i === index ? '0' : '1';
   });
+  if (persist) saveSetting('difficulty', index);
 }
 
 document.getElementById('difficultyTrack').addEventListener('click', () => {
@@ -81,7 +100,11 @@ document.getElementById('difficultyLabel').addEventListener('click', () => {
   setDifficulty((currentDifficulty + 1) % 3);
 });
 
-requestAnimationFrame(() => setDifficulty(0));
+const savedSettings = loadSettings();
+requestAnimationFrame(() => setDifficulty(
+  typeof savedSettings.difficulty === 'number' ? savedSettings.difficulty : 0,
+  false
+));
 
 const gameModeBtn = document.getElementById('gameModeBtn');
 const gameModePopup = document.getElementById('gameModePopup');
@@ -90,6 +113,24 @@ const attemptsValue = document.getElementById('attemptsValue');
 const noLimitsCheck = document.getElementById('noLimitsCheck');
 
 let noLimits = false;
+
+(function restoreGameMode() {
+  const s = loadSettings();
+
+  if (s.noLimits) {
+    noLimits = true;
+    noLimitsCheck.classList.add('checked');
+    attemptsSlider.disabled = true;
+    attemptsValue.style.opacity = '0.3';
+  }
+
+  if (typeof s.attempts === 'number') {
+    attemptsSlider.value = s.attempts;
+    attemptsValue.textContent = s.attempts;
+  } else {
+    attemptsValue.textContent = attemptsSlider.value;
+  }
+})();
 
 gameModeBtn.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -107,6 +148,7 @@ document.addEventListener('click', (e) => {
 
 attemptsSlider.addEventListener('input', () => {
   attemptsValue.textContent = attemptsSlider.value;
+  saveSetting('attempts', parseInt(attemptsSlider.value));
 });
 
 noLimitsCheck.addEventListener('click', () => {
@@ -114,6 +156,7 @@ noLimitsCheck.addEventListener('click', () => {
   noLimitsCheck.classList.toggle('checked', noLimits);
   attemptsSlider.disabled = noLimits;
   attemptsValue.style.opacity = noLimits ? '0.3' : '1';
+  saveSetting('noLimits', noLimits);
 });
 
 const card = document.querySelector('.card');
@@ -1070,9 +1113,19 @@ helpBackBtn.addEventListener('click', () => {
 });
 
 let muted = false;
+
+(function restoreMute() {
+  const s = loadSettings();
+  if (s.muted) {
+    muted = true;
+    document.getElementById('muteIcon').src = 'img/volume-slash.png';
+  }
+})();
+
 document.getElementById('muteBtn').addEventListener('click', () => {
   muted = !muted;
   document.getElementById('muteIcon').src = muted ? 'img/volume-slash.png' : 'img/volume.png';
+  saveSetting('muted', muted);
 });
 
 const RECORDS_KEY = 'colormatch_records';
