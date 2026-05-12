@@ -48,7 +48,6 @@ const sfx = (() => {
   };
 })();
 
-// ─── localStorage helpers ────────────────────────────────────────────────────
 const SETTINGS_KEY = 'colormatch_settings';
 
 function loadSettings() {
@@ -64,7 +63,6 @@ function saveSetting(key, value) {
   s[key] = value;
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 function randomHSL() {
   const h = Math.floor(Math.random() * 360);
