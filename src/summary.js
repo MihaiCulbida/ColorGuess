@@ -1,0 +1,201 @@
+function showSummaryScreen() {
+  const total = roundScores.reduce((a, b) => a + b, 0);
+  const maxScore = gameTotalAttempts * 10;
+  const pct = (total / maxScore) * 100;
+  const overlay = document.getElementById('gameOverlay');
+  const existing = document.getElementById('summaryPanel');
+  if (existing) existing.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'summaryPanel';
+
+  const summaryToast = document.createElement('div');
+  summaryToast.className = 'records-toast';
+  summaryToast.id = 'summaryToast';
+  panel.appendChild(summaryToast);
+
+  let summaryToastTimer = null;
+  function showSummaryToast(msg, type) {
+    const t = document.getElementById('summaryToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'records-toast visible ' + type;
+    clearTimeout(summaryToastTimer);
+    summaryToastTimer = setTimeout(() => { t.className = 'records-toast'; }, 3000);
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'summary-close-btn';
+  closeBtn.innerHTML = '<img src="img/close.png">';
+  const resetOverlay = () => {
+    isGameRunning = false;
+    panel.style.opacity = '0';
+    setTimeout(() => {
+      panel.remove();
+      overlay.style.display = 'none';
+      const rc = document.getElementById('roundCounter');
+      rc.textContent = '';
+      rc.classList.remove('shifted');
+      rc.style.zIndex = '10';
+      card.style.transition = 'background 0.4s ease';
+      card.style.background = '#0c0c0e';
+      cardTop.style.display = 'flex';
+      cardFooter.style.display = 'flex';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        cardTop.style.opacity = '1';
+        cardFooter.style.opacity = '1';
+      }));
+    }, 400);
+  };
+  closeBtn.addEventListener('click', resetOverlay);
+
+  const scoreRow = document.createElement('div');
+  scoreRow.className = 'summary-score-row';
+  const scoreTotalEl = document.createElement('span');
+  scoreTotalEl.className = 'summary-score-total';
+  scoreTotalEl.textContent = '0';
+  const scoreMaxEl = document.createElement('span');
+  scoreMaxEl.className = 'summary-score-max';
+  scoreMaxEl.textContent = '/' + maxScore;
+  scoreRow.appendChild(scoreTotalEl);
+  scoreRow.appendChild(scoreMaxEl);
+
+  const phraseEl = document.createElement('p');
+  phraseEl.className = 'summary-phrase';
+  phraseEl.textContent = getFinalPhrase(pct);
+
+  const colorsGrid = document.createElement('div');
+  colorsGrid.className = 'summary-colors-grid';
+  const isSingleRow = roundColors.length <= 5;
+  colorsGrid.style.marginTop = isSingleRow ? 'auto' : '20px';
+  colorsGrid.style.marginBottom = isSingleRow ? 'auto' : '0';
+
+  roundColors.forEach((entry, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'summary-color-cell';
+    cell.style.setProperty('--cell-size', '72px');
+
+    const origHalf = document.createElement('div');
+    origHalf.className = 'orig-half';
+    origHalf.style.background = hslStr(entry.original);
+
+    const guessHalf = document.createElement('div');
+    guessHalf.className = 'guess-half';
+    guessHalf.style.background = hslStr(entry.guess);
+
+    const scoreLabel = document.createElement('span');
+    scoreLabel.className = 'cell-score';
+    scoreLabel.style.color = entry.original.l > 55 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)';
+    scoreLabel.textContent = roundScores[i].toFixed(2);
+
+    cell.appendChild(origHalf);
+    cell.appendChild(guessHalf);
+    cell.appendChild(scoreLabel);
+    colorsGrid.appendChild(cell);
+  });
+
+  const playAgainBtn = document.createElement('button');
+  playAgainBtn.className = 'summary-play-again-btn';
+  playAgainBtn.textContent = 'Play again';
+  playAgainBtn.addEventListener('click', async () => {
+    isGameRunning = false;
+    panel.style.opacity = '0';
+    await sleep(400);
+    panel.remove();
+    overlay.style.display = 'none';
+
+    const roundCounter = document.getElementById('roundCounter');
+    roundCounter.textContent = '';
+    roundCounter.classList.remove('shifted');
+    roundCounter.style.zIndex = '10';
+    card.style.transition = 'background 0.4s ease';
+    card.style.background = '#0c0c0e';
+    cardTop.style.display = 'flex';
+    cardFooter.style.display = 'flex';
+
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    cardTop.style.opacity = '1';
+    cardFooter.style.opacity = '1';
+    await sleep(350);
+
+    currentRound = 1;
+    roundScores = [];
+    roundColors = [];
+    roundCounter.textContent = gameTotalAttempts ? `${currentRound}/${gameTotalAttempts}` : '';
+
+    cardTop.style.opacity = '0';
+    cardFooter.style.opacity = '0';
+    await sleep(350);
+    cardTop.style.display = 'none';
+    cardFooter.style.display = 'none';
+
+    overlay.style.display = 'flex';
+    await showCountdownWord('ready', hslStr(randomHSL()));
+    await showCountdownWord('set', hslStr(randomHSL()));
+    await showCountdownWord('go', hslStr(randomHSL()));
+    await showColorRound(DURATIONS[currentDifficulty]);
+  });
+
+  const saveRow = document.createElement('div');
+  saveRow.className = 'summary-save-row';
+
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.maxLength = 3;
+  nameInput.placeholder = 'AAA';
+  nameInput.className = 'summary-name-pill';
+  nameInput.addEventListener('input', () => {
+    nameInput.value = nameInput.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+  });
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'summary-save-btn';
+  saveBtn.textContent = 'Save the record';
+  saveBtn.addEventListener('click', () => {
+    const raw = nameInput.value.trim();
+    if (raw.length < 3) { showSummaryToast('Enter exactly 3 letters', 'error'); return; }
+    if (!/^[A-Z]{3}$/.test(raw)) { showSummaryToast('Letters only — no numbers or symbols', 'error'); return; }
+    const records = loadRecords();
+    if (records.find(r => r.name === raw && r.difficulty === currentDifficulty)) { showSummaryToast('Name already used', 'error'); return; }
+    const entry = {
+      id: Date.now() + Math.random(),
+      name: raw,
+      score: total,
+      attempts: gameTotalAttempts === null ? 0 : gameTotalAttempts,
+      rounds: roundScores.length,
+      difficulty: currentDifficulty,
+      date: new Date().toISOString(),
+      roundScores: [...roundScores],
+      roundColors: JSON.parse(JSON.stringify(roundColors.map(e => ({ original: e.original, guess: e.guess }))))
+    };
+    records.push(entry);
+    saveRecordsLS(records);
+    nameInput.disabled = true;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saved';
+    showSummaryToast('Saved', 'success');
+  });
+
+  saveRow.appendChild(nameInput);
+  saveRow.appendChild(saveBtn);
+  panel.appendChild(closeBtn);
+  panel.appendChild(scoreRow);
+  panel.appendChild(phraseEl);
+  panel.appendChild(colorsGrid);
+  panel.appendChild(playAgainBtn);
+  panel.appendChild(saveRow);
+  overlay.appendChild(panel);
+
+  requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.opacity = '1'; }));
+
+  const duration = 900;
+  const startT = performance.now();
+  function animTotal(now) {
+    const progress = Math.min((now - startT) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    scoreTotalEl.textContent = (eased * total).toFixed(2);
+    if (progress < 1) requestAnimationFrame(animTotal);
+    else scoreTotalEl.textContent = total.toFixed(2);
+  }
+  setTimeout(() => requestAnimationFrame(animTotal), 300);
+}
