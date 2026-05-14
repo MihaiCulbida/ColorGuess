@@ -124,3 +124,20 @@ if (privacyOverlay) {
     if (e.target === privacyOverlay) privacyOverlay.classList.remove('visible');
   });
 }
+
+const aboutBtn = document.getElementById('aboutBtn');
+const aboutOverlay = document.getElementById('aboutOverlay');
+const aboutCloseBtn = document.getElementById('aboutCloseBtn');
+
+if (aboutBtn) {
+  aboutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    aboutOverlay.classList.add('visible');
+  });
+}
+
+if (aboutCloseBtn) {
+  aboutCloseBtn.addEventListener('click', () => {
+    aboutOverlay.classList.remove('visible');
+  });
+}
