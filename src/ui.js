@@ -101,3 +101,26 @@ helpBackBtn.addEventListener('click', () => {
   sfx.click();
   if (helpCurrentPage > 0) goToHelpPage(helpCurrentPage - 1, 'back');
 });
+
+const privacyBtn = document.getElementById('privacyBtn');
+const privacyOverlay = document.getElementById('privacyOverlay');
+const privacyCloseBtn = document.getElementById('privacyCloseBtn');
+
+if (privacyBtn) {
+  privacyBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    privacyOverlay.classList.add('visible');
+  });
+}
+
+if (privacyCloseBtn) {
+  privacyCloseBtn.addEventListener('click', () => {
+    privacyOverlay.classList.remove('visible');
+  });
+}
+
+if (privacyOverlay) {
+  privacyOverlay.addEventListener('click', (e) => {
+    if (e.target === privacyOverlay) privacyOverlay.classList.remove('visible');
+  });
+}
