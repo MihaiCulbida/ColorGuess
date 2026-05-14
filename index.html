@@ -346,6 +346,145 @@
     </button>
     <div class="about-inner">
       <h1 class="about-title">How we score<br>your guess</h1>
+
+      <div class="about-section">
+        <h2 class="about-heading">Why not just compare sliders?</h2>
+        <p class="about-body">The obvious approach is to measure how far off each slider is. But that produces results that feel wrong. A 10% lightness shift looks dramatic in dark colors and invisible in light ones. A 40° hue shift on a gray is undetectable; on a vivid blue it's a completely different color. Raw slider math would reward and punish the wrong things.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Step 1 - Convert to CIELAB</h2>
+        <p class="about-body">Both colors are converted from HSL to CIELAB, a color space specifically designed so that equal numeric distances correspond to equal perceived differences. This is the foundation everything else is built on.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Step 2 - CIEDE2000</h2>
+        <p class="about-body">The two CIELAB values are compared using CIEDE2000, the most accurate perceptual color difference formula available. It accounts for known quirks in human vision - we're more sensitive to hue shifts in blues, less sensitive to chroma differences in dark colors, and so on. The result is a single number called ΔE: the perceptual distance between the two colors.</p>
+        <div class="about-compare-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 16px;">
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(210, 60%, 50%);"></div>
+              <div style="background: hsl(212, 58%, 52%);"></div>
+            </div>
+            <p class="about-compare-label">ΔE ≈ 2</p>
+            <p class="about-compare-sub">Nearly identical</p>
+          </div>
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(210, 60%, 50%);"></div>
+              <div style="background: hsl(230, 50%, 55%);"></div>
+            </div>
+            <p class="about-compare-label">ΔE ≈ 18</p>
+            <p class="about-compare-sub">Noticeable shift</p>
+          </div>
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(210, 60%, 50%);"></div>
+              <div style="background: hsl(30, 70%, 45%);"></div>
+            </div>
+            <p class="about-compare-label">ΔE ≈ 60</p>
+            <p class="about-compare-sub">Wrong color</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Step 3 - Map ΔE to a score</h2>
+        <p class="about-body">A raw ΔE is a distance, not a score. It's passed through a curve that maps it to 0-10. The midpoint sits at ΔE = 25.25, giving a score of exactly 5. The curve rewards precision near the top and compresses bad guesses toward zero - the difference between a 9 and a 10 is much harder to achieve than the difference between a 1 and a 2.</p>
+        <div class="about-formula">
+          score = 10 / (1 + (ΔE / 25.25)<sup>1.55</sup>)
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Step 4 - Hue adjustments</h2>
+        <p class="about-body">Getting the right color family is the hardest part of the game, so two hue-based corrections are applied on top of the base score.</p>
+        <p class="about-body">If your hue was within ~25° of the target, you recover a portion of the points lost from saturation or brightness errors. On grays, recovery fades to zero - hue is visually meaningless on desaturated colors.</p>
+        <p class="about-body">If your hue was off by more than 30° on a vivid color, a small penalty is applied. The 30° buffer means minor hue errors are never punished. Guessing the wrong hue on a gray costs nothing.</p>
+        <div class="about-formula">
+          final = clamp(base + recovery - penalty, 0, 10)
+        </div>
+      </div>
+
+      <div class="about-section" style="border-bottom: none;">
+        <h2 class="about-heading">Try it</h2>
+        <p class="about-body">Adjust the sliders and watch the score update in real time.</p>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+            <div id="wTarget" style="border-radius: 10px; height: 80px; display: flex; align-items: flex-end; padding: 8px 10px;">
+              <span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.03em;">Target</span>
+            </div>
+            <div id="wGuess" style="border-radius: 10px; height: 80px; display: flex; align-items: flex-end; padding: 8px 10px;">
+              <span style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.03em;">Your guess</span>
+            </div>
+          </div>
+        
+          <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 16px;">
+            <span id="wScore" style="font-family: 'Figtree', sans-serif; font-size: 48px; font-weight: 900; letter-spacing: -2px; color: #fff;">—</span>
+            <span style="font-family: 'Figtree', sans-serif; font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.25);">/10</span>
+          </div>
+        
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; text-align: center;">
+              <span id="wDelta" style="font-family: 'Figtree', sans-serif; font-size: 18px; font-weight: 800; color: #fff; display: block;">—</span>
+              <span style="font-size: 11px; color: rgba(255,255,255,0.35);">Delta E</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; text-align: center;">
+              <span id="wRec" style="font-family: 'Figtree', sans-serif; font-size: 18px; font-weight: 800; color: #7defa1; display: block;">—</span>
+              <span style="font-size: 11px; color: rgba(255,255,255,0.35);">Hue recovery</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; text-align: center;">
+              <span id="wPen" style="font-family: 'Figtree', sans-serif; font-size: 18px; font-weight: 800; color: #f06e6e; display: block;">—</span>
+              <span style="font-size: 11px; color: rgba(255,255,255,0.35);">Hue penalty</span>
+            </div>
+          </div>
+        
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+            <div style="display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 10px;">
+              <span style="font-size: 13px; color: rgba(255,255,255,0.45);">Hue</span>
+              <input type="range" id="wH" min="0" max="359" value="180" step="1" class="attempts-slider">
+              <span id="wHv" style="font-size: 13px; color: #fff; text-align: right;">180°</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 10px;">
+              <span style="font-size: 13px; color: rgba(255,255,255,0.45);">Saturation</span>
+              <input type="range" id="wS" min="20" max="80" value="60" step="1" class="attempts-slider">
+              <span id="wSv" style="font-size: 13px; color: #fff; text-align: right;">60%</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 90px 1fr 40px; align-items: center; gap: 10px;">
+              <span style="font-size: 13px; color: rgba(255,255,255,0.45);">Brightness</span>
+              <input type="range" id="wL" min="20" max="80" value="50" step="1" class="attempts-slider">
+              <span id="wLv" style="font-size: 13px; color: #fff; text-align: right;">50%</span>
+            </div>
+          </div>
+        
+          <div style="display: flex; gap: 8px;">
+            <button id="wNewTarget" class="records-delete-no" style="flex: 1;">New target</button>
+            <button id="wReset" class="records-delete-no" style="flex: 1;">Reset guess</button>
+          </div>
+        </div>
+      </div>
+    <div class="about-section">
+        <h2 class="about-heading">What your score means</h2>
+        <div class="about-diff-table">
+          <div class="about-diff-row" style="grid-template-columns: 50px 1fr;">
+            <span class="about-diff-name" style="color: #7defa1;">9-10</span>
+            <span class="about-diff-desc" style="font-size: 13px; color: rgba(255,255,255,0.45);">Near perfect. The colors are perceptually identical - most people couldn't tell them apart. A ΔE under 3 puts you here.</span>
+          </div>
+          <div class="about-diff-row" style="grid-template-columns: 50px 1fr;">
+            <span class="about-diff-name" style="color: #f0c96e;">6-8</span>
+            <span class="about-diff-desc" style="font-size: 13px; color: rgba(255,255,255,0.45);">Right color family, off on shade or saturation. You remembered the hue but the memory faded on the details.</span>
+          </div>
+          <div class="about-diff-row" style="grid-template-columns: 50px 1fr;">
+            <span class="about-diff-name" style="color: #f09a4e;">3-5</span>
+            <span class="about-diff-desc" style="font-size: 13px; color: rgba(255,255,255,0.45);">In the ballpark but visibly different. The hue might be close, but brightness or saturation pulled the color away.</span>
+          </div>
+          <div class="about-diff-row" style="grid-template-columns: 50px 1fr;">
+            <span class="about-diff-name" style="color: #f06e6e;">0-2</span>
+            <span class="about-diff-desc" style="font-size: 13px; color: rgba(255,255,255,0.45);">Wrong color entirely. The hue missed by more than 30° on a vivid color, or everything was off at once.</span>
+          </div>
+        </div>
+        <p class="about-body secondary" style="margin-top: 16px;">Scoring above 9 consistently is rare. The curve is steep near the top, going from a 9 to a 9.5 requires cutting your perceptual error in half. Human color memory simply isn't that precise, which is what makes it worth chasing.</p>
+      </div>
     </div>
   </div>
 </div>

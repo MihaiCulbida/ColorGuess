@@ -2221,6 +2221,15 @@ body.no-transition .nav-btn img {
   transition: opacity 0.3s ease;
   overflow-y: auto;
   user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
+  }
 
   &.visible {
     opacity: 1;
@@ -2247,6 +2256,7 @@ body.no-transition .nav-btn img {
   gap: 6px;
   cursor: pointer;
   transition: opacity 0.15s;
+  z-index: 10;
 
   img {
     width: 14px;
@@ -2259,13 +2269,13 @@ body.no-transition .nav-btn img {
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255,255,255,0.4);
   }
 
   &:hover img,
   &:hover span {
     opacity: 0.8;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255,255,255,0.8);
   }
 }
 

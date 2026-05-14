@@ -2301,6 +2301,18 @@ body.no-transition .nav-btn img {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.scoring-overlay::-webkit-scrollbar {
+  width: 4px;
+}
+.scoring-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scoring-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
 }
 .scoring-overlay.visible {
   opacity: 1;
@@ -2326,6 +2338,7 @@ body.no-transition .nav-btn img {
   gap: 6px;
   cursor: pointer;
   transition: opacity 0.15s;
+  z-index: 10;
 }
 .scoring-close img {
   width: 14px;
