@@ -1949,4 +1949,44 @@ body.no-transition .nav-btn img {
 }
 .records-row:active {
   transform: scale(0.985);
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 24px 20px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.footer a {
+  font-family: "Figtree", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  color: rgba(0, 0, 0, 0.38);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.footer a:hover {
+  color: rgba(0, 0, 0, 0.65);
+}
+.footer-sep {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.18);
+}
+
+body.dark-bg .footer a {
+  color: rgba(255, 255, 255, 0.28);
+}
+body.dark-bg .footer a:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+body.dark-bg .footer-sep {
+  color: rgba(255, 255, 255, 0.12);
 }/*# sourceMappingURL=style.css.map */
