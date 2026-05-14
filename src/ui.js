@@ -106,38 +106,37 @@ const privacyBtn = document.getElementById('privacyBtn');
 const privacyOverlay = document.getElementById('privacyOverlay');
 const privacyCloseBtn = document.getElementById('privacyCloseBtn');
 
-if (privacyBtn) {
-  privacyBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    privacyOverlay.classList.add('visible');
-  });
-}
+privacyBtn.addEventListener('click', e => {
+  e.preventDefault();
+  privacyOverlay.classList.add('visible');
+});
 
-if (privacyCloseBtn) {
-  privacyCloseBtn.addEventListener('click', () => {
-    privacyOverlay.classList.remove('visible');
-  });
-}
-
-if (privacyOverlay) {
-  privacyOverlay.addEventListener('click', (e) => {
-    if (e.target === privacyOverlay) privacyOverlay.classList.remove('visible');
-  });
-}
+privacyCloseBtn.addEventListener('click', () => {
+  privacyOverlay.classList.remove('visible');
+});
 
 const aboutBtn = document.getElementById('aboutBtn');
 const aboutOverlay = document.getElementById('aboutOverlay');
 const aboutCloseBtn = document.getElementById('aboutCloseBtn');
 
-if (aboutBtn) {
-  aboutBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    aboutOverlay.classList.add('visible');
-  });
-}
+aboutBtn.addEventListener('click', e => {
+  e.preventDefault();
+  aboutOverlay.classList.add('visible');
+});
 
-if (aboutCloseBtn) {
-  aboutCloseBtn.addEventListener('click', () => {
-    aboutOverlay.classList.remove('visible');
-  });
-}
+aboutCloseBtn.addEventListener('click', () => {
+  aboutOverlay.classList.remove('visible');
+});
+
+const scoringBtn = document.getElementById('scoringBtn');
+const scoringOverlay = document.getElementById('scoringOverlay');
+const scoringCloseBtn = document.getElementById('scoringCloseBtn');
+
+scoringBtn.addEventListener('click', e => {
+  e.preventDefault();
+  scoringOverlay.classList.add('visible');
+});
+
+scoringCloseBtn.addEventListener('click', () => {
+  scoringOverlay.classList.remove('visible');
+});
