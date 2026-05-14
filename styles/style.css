@@ -1957,10 +1957,38 @@ body.no-transition .nav-btn img {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
+  overflow-y: auto;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.about-overlay::-webkit-scrollbar {
+  width: 4px;
+}
+.about-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+.about-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+.about-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 .about-overlay.visible {
   opacity: 1;
   pointer-events: all;
+}
+
+.about-modal {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
 }
 
 .about-close {
@@ -1983,13 +2011,282 @@ body.no-transition .nav-btn img {
 }
 .about-close span {
   font-family: "DM Sans", sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
 }
 .about-close:hover img, .about-close:hover span {
   opacity: 0.8;
   color: rgba(255, 255, 255, 0.8);
+}
+
+.about-inner {
+  flex: 1;
+  padding: 60px 40px 48px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  overflow: visible;
+  scrollbar-width: none;
+}
+.about-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.about-title {
+  font-family: "Figtree", sans-serif;
+  font-size: 72px;
+  font-weight: 900;
+  letter-spacing: -3px;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 40px;
+}
+
+.about-section {
+  margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.about-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.about-heading {
+  font-family: "Figtree", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.about-body {
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.75;
+  margin-bottom: 12px;
+}
+.about-body:last-child {
+  margin-bottom: 0;
+}
+.about-body.secondary {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.25);
+}
+.about-body a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.about-body a:hover {
+  color: #fff;
+}
+
+.about-example-row {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.about-color-chip {
+  flex: 1;
+  height: 64px;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px 10px;
+}
+.about-color-chip span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.about-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.about-compare-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.about-compare-chips {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.about-compare-chips div {
+  flex: 1;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.about-compare-label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.about-compare-sub {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.about-step {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+  align-items: flex-start;
+}
+
+.about-step-num {
+  font-family: "Figtree", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.about-step-title {
+  font-family: "Figtree", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+}
+
+.about-formula {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 12px 0;
+  letter-spacing: 0.02em;
+}
+.about-formula sup {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.about-delta-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.about-delta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.about-delta-chips {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.about-delta-chips div {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.about-delta-val {
+  font-family: "Figtree", sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  min-width: 60px;
+}
+.about-delta-val.high {
+  color: #7defa1;
+}
+.about-delta-val.mid {
+  color: #f0c96e;
+}
+.about-delta-val.bad {
+  color: #f06e6e;
+}
+
+.about-delta-desc {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.about-diff-table {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: 12px;
+}
+
+.about-diff-row {
+  display: grid;
+  grid-template-columns: 70px 90px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.about-diff-name {
+  font-family: "Figtree", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.about-diff-time {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.about-diff-desc {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
 }
 
 .privacy-overlay {

@@ -190,20 +190,20 @@
             <span class="help-diff-desc">Blink and it's gone.</span>
           </div>
         </div>
-        <p class="help-body" style="margin-top: 20px;">The color shown is always randomly generated — hue is completely random, while saturation and brightness are kept in a visible mid-range so nothing is too dark or too washed out.</p>
+        <p class="help-body" style="margin-top: 20px;">The color shown is always randomly generated, hue is completely random, while saturation and brightness are kept in a visible mid-range so nothing is too dark or too washed out.</p>
       </div>
 
       <div class="help-page" data-page="2">
         <span class="help-page-label">03 / 03</span>
         <h2 class="help-heading">Scoring</h2>
-        <p class="help-body">Each round is scored 0–10. Colors are compared using <strong>CIEDE2000</strong> — a color science formula that measures how different two colors actually look to the human eye, not just how far apart their values are.</p>
+        <p class="help-body">Each round is scored 0–10. Colors are compared using <strong>CIEDE2000</strong>, a color science formula that measures how different two colors actually look to the human eye, not just how far apart their values are.</p>
         <div class="help-score-grid">
           <div class="help-score-row"><span class="help-score-val high">9–10</span><span class="help-score-desc">Near perfect. Basically the same color.</span></div>
           <div class="help-score-row"><span class="help-score-val mid">6–8</span><span class="help-score-desc">Right family, off on shade or saturation.</span></div>
           <div class="help-score-row"><span class="help-score-val low">3–5</span><span class="help-score-desc">In the ballpark but visibly different.</span></div>
           <div class="help-score-row"><span class="help-score-val bad">0–2</span><span class="help-score-desc">Wrong color entirely.</span></div>
         </div>
-        <p class="help-body secondary" style="margin-top: 20px;">Getting the hue right — the color family — matters most. Nail the hue and you recover points even if brightness or saturation are off. On grays, hue doesn't count.</p>
+        <p class="help-body secondary" style="margin-top: 20px;">Getting the hue right - the color family - matters most. Nail the hue and you recover points even if brightness or saturation are off. On grays, hue doesn't count.</p>
       </div>
 
     </div>
@@ -229,6 +229,112 @@
       <img src="img/arrow-left.png" alt="Back">
       <span>Back</span>
     </button>
+    <div class="about-inner">
+      <h1 class="about-title">About</h1>
+      <div class="about-section">
+        <h2 class="about-heading">What is ColorMatch?</h2>
+        <p class="about-body">ColorMatch is a color memory game. A color fills the screen for a few seconds, you memorize it, then recreate it from memory using three sliders that control hue, saturation, and brightness. It sounds simple. It's not.</p>
+        <p class="about-body">Designed and built by Culbida Mihail, a student, over the course of about a month. The CIEDE2000 algorithm was implemented from scratch in JavaScript, no libraries, no shortcuts. Every detail, from the scoring curve to the transitions, was built solo.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">How colors are generated</h2>
+        <p class="about-body">Every round, a color is generated with a fully random hue (0–360°). Saturation and lightness are kept between 20% and 80% intentionally avoiding extremes that would be unfair or invisible. No black, no white, no neon.</p>
+        <div class="about-example-row">
+          <div class="about-color-chip" style="background: hsl(24, 65%, 50%);">
+            <span>H 24 · S 65 · L 50</span>
+          </div>
+          <div class="about-color-chip" style="background: hsl(190, 42%, 38%);">
+            <span>H 190 · S 42 · L 38</span>
+          </div>
+          <div class="about-color-chip" style="background: hsl(310, 55%, 62%);">
+            <span>H 310 · S 55 · L 62</span>
+          </div>
+        </div>
+        <p class="about-body secondary">Three possible colors - all valid outputs of the generator. Always visible, always fair.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Why not just compare slider values?</h2>
+        <p class="about-body">The obvious approach would be to measure how far off each slider is and call it a score. But that produces results that feel wrong, because human eyes don't see color the way numbers work.</p>
+        <div class="about-compare-grid">
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(200, 80%, 15%);"></div>
+              <div style="background: hsl(200, 80%, 25%);"></div>
+            </div>
+            <p class="about-compare-label">Same 10% shift - dark range</p>
+            <p class="about-compare-sub">Looks very different</p>
+          </div>
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(200, 80%, 75%);"></div>
+              <div style="background: hsl(200, 80%, 85%);"></div>
+            </div>
+            <p class="about-compare-label">Same 10% shift - light range</p>
+            <p class="about-compare-sub">Barely noticeable</p>
+          </div>
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(200, 80%, 50%);"></div>
+              <div style="background: hsl(240, 80%, 50%);"></div>
+            </div>
+            <p class="about-compare-label">40° hue shift - saturated</p>
+            <p class="about-compare-sub">Completely different color</p>
+          </div>
+          <div class="about-compare-item">
+            <div class="about-compare-chips">
+              <div style="background: hsl(200, 8%, 50%);"></div>
+              <div style="background: hsl(240, 8%, 50%);"></div>
+            </div>
+            <p class="about-compare-label">40° hue shift - gray</p>
+            <p class="about-compare-sub">Practically identical</p>
+          </div>
+        </div>
+        <p class="about-body">The same numerical difference on a slider can look dramatic or invisible depending on context. Raw slider math would reward and punish the wrong things.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">The scoring pipeline</h2>
+        <p class="about-body">Scoring starts by converting both colors from HSL to CIELAB, a color space where equal numeric distances correspond to equal perceived differences. From there, CIEDE2000 - the most accurate perceptual color difference formula available, compares the two values and returns a single number called ΔE, representing how far apart the colors look to a human eye. That ΔE is then mapped to a score between 0 and 10 using a curve that rewards precision near the top and compresses errors at the bottom. Finally, two hue-based adjustments are applied: a small recovery bonus if your hue was close, and a penalty if it was significantly off on vivid colors. The result is clamped and rounded to two decimals.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Difficulty & sessions</h2>
+        <p class="about-body">Difficulty controls how long the color is visible before the sliders appear.</p>
+        <div class="about-diff-table">
+          <div class="about-diff-row">
+            <span class="about-diff-name">Easy</span>
+            <span class="about-diff-time">5 seconds</span>
+            <span class="about-diff-desc">Enough time to really look.</span>
+          </div>
+          <div class="about-diff-row">
+            <span class="about-diff-name">Medium</span>
+            <span class="about-diff-time">3 seconds</span>
+            <span class="about-diff-desc">You'll need to focus.</span>
+          </div>
+          <div class="about-diff-row">
+            <span class="about-diff-name">Hard</span>
+            <span class="about-diff-time">1 second</span>
+            <span class="about-diff-desc">Blink and it's gone.</span>
+          </div>
+        </div>
+        <p class="about-body" style="margin-top: 16px;">Sessions run from 1 to 10 rounds, or limitless. Stop whenever you want. Scores are summed at the end and can be saved locally with your initials.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Training mode</h2>
+        <p class="about-body">Training mode removes the timer and scoring. The color stays visible while you drag the sliders in real time. Useful for understanding how hue, saturation, and brightness interact before playing properly.</p>
+      </div>
+
+      <div class="about-section">
+        <h2 class="about-heading">Get in touch</h2>
+        <p class="about-body">Whether you have a bug to report, a suggestion, or just want to say something - feel free to reach out.</p>
+        <p class="about-body">Email: <a href="mailto:clbidamihai@gmail.com">clbidamihai@gmail.com</a><br>
+        <p class="about-body">Replies in less than 24 hours.</p>
+      </div>
+
+    </div>
   </div>
 </div>
 
