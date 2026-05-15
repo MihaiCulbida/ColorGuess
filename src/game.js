@@ -151,6 +151,7 @@ function showResultScreen(original, guess, showPhrase) {
   const phraseEl = document.getElementById('resultScorePhrase');
   if (showPhrase) {
     phraseEl.textContent = getScorePhrase(score);
+    phraseEl.style.color = topColorFaded;
     phraseEl.style.opacity = '0';
     phraseEl.style.transform = 'translateY(-8px)';
     phraseEl.style.display = 'block';

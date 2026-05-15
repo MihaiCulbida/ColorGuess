@@ -48,16 +48,18 @@ function updateCounterColor(h, s, l) {
 }
 
 function updateGameBtnColors(h, s, l) {
-  const adaptive = getAdaptiveColor(h, mapS(s), mapL(l), 0.12);
-  const adaptiveBorder = getAdaptiveColor(h, mapS(s), mapL(l), 0.18);
-  const perceived = (() => {
+  const isDarkCard = card.style.background === '#0c0c0e' || card.style.background === 'rgb(12, 12, 14)';
+  const adaptive = isDarkCard ? 'rgba(255,255,255,0.15)' : getAdaptiveColor(h, mapS(s), mapL(l), 0.12);
+  const adaptiveBorder = isDarkCard ? 'rgba(255,255,255,0.25)' : getAdaptiveColor(h, mapS(s), mapL(l), 0.18);
+  const imgFilter = isDarkCard ? 'invert(1)' : (() => {
     const cardS = mapS(s), cardL = mapL(l);
     const sn = cardS/100, ln = cardL/100;
     const c = (1-Math.abs(2*ln-1))*sn, x = c*(1-Math.abs((h/60)%2-1)), m = ln-c/2;
     const [r,g,b] = [[c,x,0],[x,c,0],[0,c,x],[0,x,c],[x,0,c],[c,0,x]][Math.floor(h/60)%6].map(v=>{const lin=v+m;return lin<=0.04045?lin/12.92:Math.pow((lin+0.055)/1.055,2.4);});
-    return 0.2126*r+0.7152*g+0.0722*b;
+    const perceived = 0.2126*r+0.7152*g+0.0722*b;
+    return perceived > 0.179 ? 'invert(0)' : 'invert(1)';
   })();
-  const imgFilter = perceived > 0.179 ? 'invert(0)' : 'invert(1)';
+
   const toggleBtn = document.getElementById('toggleViewBtn');
   toggleBtn.style.background = adaptive;
   toggleBtn.style.borderColor = adaptiveBorder;
