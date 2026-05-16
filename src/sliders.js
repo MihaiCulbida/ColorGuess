@@ -67,6 +67,10 @@ function updateGameBtnColors(h, s, l) {
   submitBtn.style.background = adaptive;
   submitBtn.style.borderColor = adaptiveBorder;
   submitBtn.querySelector('img').style.filter = imgFilter;
+  const exitBtn = document.getElementById('trainingExitBtn');
+  if (exitBtn) {
+    exitBtn.querySelector('img').style.filter = imgFilter;
+  }
 }
 
 function update() {

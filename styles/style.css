@@ -647,33 +647,66 @@ input.vr::-moz-range-thumb {
           user-select: none;
 }
 
-.toggle-view-btn {
+.training-exit-btn {
   position: absolute;
   top: 22px;
   right: 26px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
-  transition: background 0.2s;
+  z-index: 50;
+  transition: transform 0.3s ease-in-out;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
 }
+
+.training-exit-btn:hover {
+  transform: scale(1.1);
+}
+
+.training-exit-btn img {
+  width: 13px;
+  height: 13px;
+  filter: invert(1);
+  opacity: 0.7;
+}
+
+.toggle-view-btn {
+  position: absolute;
+  bottom: 26px;
+  right: 88px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: background 0.2s, transform 0.2s, opacity 0.3s ease;
+  user-select: none;
+}
 .toggle-view-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.06);
+}
+.toggle-view-btn:active {
+  transform: scale(0.95);
 }
 .toggle-view-btn img {
   width: 16px;
   height: 16px;
   filter: invert(1);
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .submit-btn {
@@ -694,7 +727,7 @@ input.vr::-moz-range-thumb {
   cursor: pointer;
   z-index: 20;
   transition: background 0.2s, transform 0.2s, opacity 0.3s ease;
-  backdrop-filter: blur(4px);
+  user-select: none;
 }
 .submit-btn:hover {
   background: rgba(255, 255, 255, 0.22);
@@ -806,7 +839,6 @@ input.vr::-moz-range-thumb {
   cursor: pointer;
   z-index: 10;
   transition: background 0.2s, transform 0.2s;
-  backdrop-filter: blur(4px);
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;

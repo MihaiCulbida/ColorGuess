@@ -16,6 +16,8 @@ function sleep(ms) {
 }
 
 async function showCountdownWord(text, color) {
+  const exitBtn = document.getElementById('trainingExitBtn');
+  if (exitBtn) exitBtn.style.display = 'none';
   card.style.transition = 'background 0.5s ease';
   card.style.background = color;
   const [h, s, l] = color.match(/\d+/g).map(Number);
@@ -43,6 +45,8 @@ async function showColorRound(duration) {
   const timerMillis = document.getElementById('timerMillis');
 
   cornerTimer.style.display = 'flex';
+  const exitBtn = document.getElementById('trainingExitBtn');
+  if (exitBtn) exitBtn.style.display = 'none';
   let lastSec = Math.floor(duration / 1000);
   timerSeconds.textContent = lastSec;
 
@@ -93,6 +97,8 @@ async function showColorRound(duration) {
   updateCounterColor(0, 0, 10);
   await sleep(400);
 
+  if (exitBtn && gameTotalAttempts === null) exitBtn.style.display = 'flex';
+
   hS.value = 180; sS.value = 60; lS.value = 50;
   buildHueBg(); updateSliders(); updateThumbs();
 
@@ -106,7 +112,10 @@ async function showColorRound(duration) {
   }));
 
   submitBtn.style.display = 'flex';
-  submitBtn.style.opacity = '1';
+  submitBtn.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    submitBtn.style.opacity = '1';
+  }));
   updateGameBtnColors(+hS.value, +sS.value, +lS.value);
   document.getElementById('toggleViewBtn').style.display = 'none';
 }
@@ -185,7 +194,8 @@ function showResultScreen(original, guess, showPhrase) {
     phraseEl.style.transform = 'translateY(0)';
   }), 400);
   hslPanel.style.display = 'none';
-  document.getElementById('toggleViewBtn').style.display = 'none';
+  toggleViewBtn.style.opacity = '0';
+  setTimeout(() => { toggleViewBtn.style.display = 'none'; }, 300);
   submitBtn.style.display = 'none';
 
   card.style.transition = 'background 0.4s ease';
@@ -268,7 +278,20 @@ document.getElementById('startBtn').addEventListener('click', async () => {
   cardTop.style.display = 'none';
   cardFooter.style.display = 'none';
 
-  document.getElementById('gameOverlay').style.display = 'flex';
+    document.getElementById('gameOverlay').style.display = 'flex';
+ 
+  if (gameTotalAttempts === null) {
+    let exitBtn = document.getElementById('trainingExitBtn');
+    if (!exitBtn) {
+      exitBtn = document.createElement('button');
+      exitBtn.id = 'trainingExitBtn';
+      exitBtn.className = 'training-exit-btn';
+      exitBtn.innerHTML = '<img src="img/close.png" alt="Exit">';
+      document.getElementById('gameOverlay').appendChild(exitBtn);
+    }
+    exitBtn.style.display = 'flex';
+    exitBtn.onclick = () => resetToMenu();
+  }
 
   await showCountdownWord('ready', hslStr(randomHSL()));
   await showCountdownWord('set', hslStr(randomHSL()));
