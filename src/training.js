@@ -48,6 +48,8 @@ async function startTraining() {
   card.style.transition = 'background 0.5s ease';
   card.style.background = hslStr(trainingColor);
   updateCounterColor(trainingColor.h, trainingColor.s, trainingColor.l);
+  const exitBtnEl = document.getElementById('trainingExitBtn');
+  if (exitBtnEl) exitBtnEl.style.display = 'none';
   await sleep(2000);
 
   card.style.transition = 'background 0.4s ease';
