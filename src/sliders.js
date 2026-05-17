@@ -108,3 +108,12 @@ updateThumbs();
 hS.addEventListener('input', () => showSliderLabel('HUE'));
 sS.addEventListener('input', () => showSliderLabel('SATURATION'));
 lS.addEventListener('input', () => showSliderLabel('BRIGHTNESS'));
+
+let slideThrottle = 0;
+[hS, sS, lS].forEach(r => r.addEventListener('input', () => {
+  const now = performance.now();
+  if (now - slideThrottle < 40) return;
+  slideThrottle = now;
+  const min = +r.min, max = +r.max;
+  sfx.slide((+r.value - min) / (max - min));
+}));
