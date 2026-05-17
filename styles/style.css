@@ -598,7 +598,6 @@ input.vr {
   outline: none;
   border: none;
   cursor: pointer;
-  touch-action: none;
   z-index: 2;
   margin: 0;
   padding: 0;

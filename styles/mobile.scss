@@ -1,0 +1,448 @@
+@media (max-width: 768px) {
+  body {
+    align-items: center;
+    min-height: 100dvh;
+  }
+
+  .navbar {
+    padding: 0 20px;
+    height: 52px;
+  }
+
+  .nav-right {
+    margin-right: 8px;
+    gap: 22px;
+  }
+
+  .card {
+    width: calc(100vw - 40px);
+    height: auto;
+    min-height: 400px;
+    border-radius: 16px;
+    padding: 2rem 1.8rem 1.4rem;
+  }
+
+  .title {
+    font-size: 72px;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  .description {
+    font-size: 14px;
+
+    &.secondary {
+      font-size: 13px;
+    }
+
+    &.game-mode-hint {
+      font-size: 12px;
+      max-width: 100%;
+    }
+  }
+
+  .card-footer {
+    gap: 12px;
+  }
+
+  .game-mode-circle,
+  .training-circle,
+  .arrow-btn {
+    width: 62px;
+    height: 62px;
+  }
+
+  .slider-wrap {
+    flex: 0 0 48px;
+  }
+
+  input.vr {
+    width: 400px;
+  }
+
+  .corner-timer {
+    .seconds,
+    .millis {
+      font-size: 72px;
+    }
+
+    .seconds {
+      right: 92px;
+    }
+
+    .millis {
+      width: 88px;
+    }
+  }
+
+  .submit-btn,
+  .toggle-view-btn {
+    width: 52px;
+    height: 52px;
+  }
+
+  #summaryPanel {
+    .summary-score-total,
+    .summary-score-max {
+      font-size: 52px;
+      letter-spacing: -2px;
+    }
+  }
+
+  .help-modal {
+    width: calc(100vw - 48px);
+    padding: 28px 22px 20px;
+  }
+
+  .help-heading {
+    font-size: 26px;
+  }
+
+  .help-pages {
+    min-height: 290px;
+  }
+
+  .about-inner,
+  .privacy-inner {
+    padding: 60px 28px 48px;
+  }
+
+  .about-title,
+  .privacy-title {
+    font-size: 56px;
+    letter-spacing: -2px;
+  }
+
+  .game-mode-popup {
+    width: 190px;
+  }
+
+  .footer {
+    padding: 0 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    align-items: flex-start;
+    padding: 0;
+    min-height: 100dvh;
+  }
+
+  .navbar {
+    padding: 0 16px;
+    height: 50px;
+  }
+
+  .nav-right {
+    margin-right: 0;
+    gap: 18px;
+  }
+
+  .nav-btn img {
+    width: 22px;
+    height: 22px;
+  }
+
+  #helpBtn img {
+    width: 26px;
+    height: 26px;
+  }
+
+  #muteBtn img {
+    width: 19px;
+    height: 19px;
+  }
+
+  .card {
+    width: 100vw;
+    min-height: 100dvh;
+    height: auto;
+    border-radius: 0;
+    padding: 68px 20px 24px;
+    box-shadow: none;
+  }
+
+  .card-footer {
+    gap: 10px;
+    padding: 0;
+    flex-wrap: nowrap;
+  }
+
+  .title {
+    font-size: 60px;
+    letter-spacing: -2px;
+    margin-bottom: 14px;
+  }
+
+  .description {
+    font-size: 13px;
+
+    &.secondary {
+      font-size: 12px;
+    }
+
+    &.game-mode-hint {
+      font-size: 11px;
+      max-width: 100%;
+    }
+  }
+
+  .game-mode-circle,
+  .training-circle,
+  .arrow-btn {
+    width: 56px;
+    height: 56px;
+  }
+
+  .game-mode-circle img,
+  .training-circle img {
+    width: 21px;
+    height: 21px;
+  }
+
+  .arrow-btn img {
+    width: 17px;
+    height: 17px;
+  }
+
+  .slider-wrap {
+    flex: 0 0 52px;
+  }
+
+  input.vr {
+    width: 100dvh;
+  }
+
+  .custom-thumb {
+    width: 18px;
+    height: 18px;
+  }
+
+  .corner-timer {
+    top: 16px;
+    right: 18px;
+
+    .seconds,
+    .millis {
+      font-size: 58px;
+    }
+
+    .seconds {
+      right: 72px;
+    }
+
+    .millis {
+      width: 70px;
+    }
+  }
+
+  .countdown-word {
+    font-size: 58px;
+    letter-spacing: -3px;
+  }
+
+  .round-counter {
+    top: 20px;
+    left: 20px;
+    font-size: 14px;
+
+    &.shifted {
+      left: 140px;
+    }
+  }
+
+  .submit-btn,
+  .toggle-view-btn {
+    width: 50px;
+    height: 50px;
+    bottom: 18px;
+  }
+
+  .submit-btn {
+    right: 18px;
+  }
+
+  .toggle-view-btn {
+    right: 76px;
+  }
+
+  .submit-btn img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .toggle-view-btn img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .result-score {
+    font-size: 52px;
+  }
+
+  .result-next-btn {
+    width: 50px;
+    height: 50px;
+    bottom: 14px;
+    right: 18px;
+  }
+
+  .result-color-sublabel {
+    font-size: 10px;
+  }
+
+  .result-color-values {
+    font-size: 13px;
+  }
+
+  #summaryPanel {
+    padding: 20px 18px 18px;
+    border-radius: 0;
+
+    .summary-score-total,
+    .summary-score-max {
+      font-size: 44px;
+      letter-spacing: -2px;
+    }
+
+    .summary-phrase {
+      font-size: 13px;
+    }
+
+    .summary-colors-grid {
+      gap: 4px;
+    }
+
+    .summary-color-cell {
+      --cell-size: 54px !important;
+    }
+
+    .summary-play-again-btn {
+      height: 40px;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .summary-close-btn {
+      top: 16px;
+      right: 16px;
+    }
+  }
+
+  .summary-save-row {
+    gap: 8px;
+  }
+
+  .summary-name-pill {
+    width: 80px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .summary-save-btn {
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .records-panel,
+  .record-detail-panel {
+    border-radius: 0;
+  }
+
+  .records-inner {
+    padding: 20px 16px 14px;
+  }
+
+  .record-detail-panel {
+    padding: 18px 18px 16px;
+  }
+
+  .record-detail-cell {
+    width: 58px;
+    height: 58px;
+  }
+
+  .record-detail-score-total,
+  .record-detail-score-max {
+    font-size: 42px;
+    letter-spacing: -2px;
+  }
+
+  .help-modal {
+    width: calc(100vw - 24px);
+    padding: 24px 18px 18px;
+    margin: 12px;
+    border-radius: 16px;
+  }
+
+  .help-heading {
+    font-size: 22px;
+  }
+
+  .help-pages {
+    min-height: 260px;
+  }
+
+  .help-body {
+    font-size: 13px;
+  }
+
+  .about-inner,
+  .privacy-inner {
+    padding: 52px 18px 36px;
+  }
+
+  .about-title,
+  .privacy-title {
+    font-size: 40px;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+  }
+
+  .about-heading,
+  .privacy-heading {
+    font-size: 15px;
+  }
+
+  .about-body,
+  .privacy-body {
+    font-size: 14px;
+  }
+
+  .about-compare-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .about-example-row {
+    gap: 6px;
+  }
+
+  .about-color-chip {
+    height: 54px;
+  }
+
+  .game-mode-popup {
+    width: calc(100vw - 32px);
+    left: 16px !important;
+  }
+
+  #sliderLabel {
+    left: 120px;
+    bottom: 18px;
+    font-size: 10px;
+  }
+
+  .footer {
+    padding: 0 14px 12px;
+
+    a {
+      font-size: 11px;
+    }
+
+    &-sep {
+      font-size: 14px;
+    }
+  }
+}
