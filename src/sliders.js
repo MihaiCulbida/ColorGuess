@@ -117,5 +117,3 @@ let slideThrottle = 0;
   const min = +r.min, max = +r.max;
   sfx.slide((+r.value - min) / (max - min));
 }));
-
-document.getElementById('hslPanel').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
