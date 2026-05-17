@@ -26,6 +26,7 @@ async function showCountdownWord(text, color) {
   else if (text === 'set') sfx.set();
   else if (text === 'go') sfx.go();
   const el = document.getElementById('countdownWord');
+  el.style.color = getAdaptiveColor(h, s, l, 0.9);
   el.textContent = text;
   el.classList.add('visible');
   await sleep(650);
@@ -47,6 +48,8 @@ async function showColorRound(duration) {
   cornerTimer.style.display = 'flex';
   const exitBtn = document.getElementById('trainingExitBtn');
   if (exitBtn) exitBtn.style.display = 'none';
+  timerSeconds.style.color = getAdaptiveColor(color.h, color.s, color.l, 0.9);
+  timerMillis.style.color = getAdaptiveColor(color.h, color.s, color.l, 0.5);
   let lastSec = Math.floor(duration / 1000);
   timerSeconds.textContent = lastSec;
 
