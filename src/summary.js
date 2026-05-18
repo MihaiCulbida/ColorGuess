@@ -55,11 +55,13 @@ function showSummaryScreen() {
     const cols = count <= 5 ? count : Math.ceil(count / 2);
     const cellSize = Math.min(60, Math.floor((gridW - gap * (cols - 1)) / cols));
     const totalGridW = cols * cellSize + (cols - 1) * gap;
-    colorsGrid.style.display = 'grid';
-    colorsGrid.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
-    colorsGrid.style.width = totalGridW + 'px';
-    colorsGrid.style.gap = gap + 'px';
-    colorsGrid.style.margin = '12px auto';
+    colorsGrid.style.cssText = `
+      display: grid !important;
+      grid-template-columns: repeat(${cols}, ${cellSize}px);
+      width: ${totalGridW}px;
+      gap: ${gap}px;
+      margin: 12px auto;
+    `;
     roundColors.forEach((entry, i) => {
       const cell = document.createElement('div');
       cell.className = 'summary-color-cell';
