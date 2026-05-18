@@ -52,8 +52,8 @@ function showSummaryScreen() {
   if (isMobile) {
     const gap = 3;
     const gridW = card.getBoundingClientRect().width - 36;
-    const cols = Math.ceil(count / 2);
-    const cellSize = Math.floor((gridW - gap * (cols - 1)) / cols);
+    const cols = count <= 5 ? count : Math.ceil(count / 2);
+    const cellSize = Math.min(60, Math.floor((gridW - gap * (cols - 1)) / cols));
     const totalGridW = cols * cellSize + (cols - 1) * gap;
     colorsGrid.style.display = 'grid';
     colorsGrid.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
