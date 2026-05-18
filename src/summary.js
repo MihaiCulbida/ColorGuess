@@ -24,31 +24,6 @@ function showSummaryScreen() {
     summaryToastTimer = setTimeout(() => { t.className = 'records-toast'; }, 3000);
   }
 
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'summary-close-btn';
-  closeBtn.innerHTML = '<img src="img/close.png">';
-  const resetOverlay = () => {
-    isGameRunning = false;
-    panel.style.opacity = '0';
-    setTimeout(() => {
-      panel.remove();
-      overlay.style.display = 'none';
-      const rc = document.getElementById('roundCounter');
-      rc.textContent = '';
-      rc.classList.remove('shifted');
-      rc.style.zIndex = '10';
-      card.style.transition = 'background 0.4s ease';
-      card.style.background = '#0c0c0e';
-      cardTop.style.display = 'flex';
-      cardFooter.style.display = 'flex';
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        cardTop.style.opacity = '1';
-        cardFooter.style.opacity = '1';
-      }));
-    }, 400);
-  };
-  closeBtn.addEventListener('click', resetOverlay);
-
   const scoreRow = document.createElement('div');
   scoreRow.className = 'summary-score-row';
   const scoreTotalEl = document.createElement('span');
@@ -70,10 +45,13 @@ function showSummaryScreen() {
   colorsGrid.style.marginTop = isSingleRow ? 'auto' : '20px';
   colorsGrid.style.marginBottom = isSingleRow ? 'auto' : '0';
 
+  const cellEls = [];
+  const count = roundColors.length;
+  const cellSize = count <= 5 ? 72 : count <= 7 ? 60 : 50;
   roundColors.forEach((entry, i) => {
     const cell = document.createElement('div');
     cell.className = 'summary-color-cell';
-    cell.style.setProperty('--cell-size', '72px');
+    cell.style.setProperty('--cell-size', cellSize + 'px');
 
     const origHalf = document.createElement('div');
     origHalf.className = 'orig-half';
@@ -92,6 +70,7 @@ function showSummaryScreen() {
     cell.appendChild(guessHalf);
     cell.appendChild(scoreLabel);
     colorsGrid.appendChild(cell);
+    cellEls.push(cell);
   });
 
   const playAgainBtn = document.createElement('button');
@@ -178,24 +157,114 @@ function showSummaryScreen() {
 
   saveRow.appendChild(nameInput);
   saveRow.appendChild(saveBtn);
-  panel.appendChild(closeBtn);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'summary-close-btn';
+  closeBtn.innerHTML = '<img src="img/close.png">';
+  const resetOverlay = () => {
+    isGameRunning = false;
+    panel.style.opacity = '0';
+    setTimeout(() => {
+      panel.remove();
+      overlay.style.display = 'none';
+      const rc = document.getElementById('roundCounter');
+      rc.textContent = '';
+      rc.classList.remove('shifted');
+      rc.style.zIndex = '10';
+      card.style.transition = 'background 0.4s ease';
+      card.style.background = '#0c0c0e';
+      cardTop.style.display = 'flex';
+      cardFooter.style.display = 'flex';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        cardTop.style.opacity = '1';
+        cardFooter.style.opacity = '1';
+      }));
+    }, 400);
+  };
+  closeBtn.addEventListener('click', resetOverlay);
+
   panel.appendChild(scoreRow);
   panel.appendChild(phraseEl);
   panel.appendChild(colorsGrid);
   panel.appendChild(playAgainBtn);
   panel.appendChild(saveRow);
+  panel.appendChild(closeBtn);
   overlay.appendChild(panel);
 
+
+  const staggerEls = [scoreRow, phraseEl, ...cellEls, playAgainBtn, saveRow, closeBtn];
+  staggerEls.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    el.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+  });
+
+  panel.style.opacity = '0';
+  panel.style.transition = 'opacity 0.3s ease';
   requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.opacity = '1'; }));
 
-  const duration = 900;
-  const startT = performance.now();
+  let skipped = false;
+  let scoreAnimRaf = null;
+  let scoreAnimStart = null;
+  const SCORE_DURATION = 900;
+
+  function revealAll() {
+    skipped = true;
+    if (scoreAnimRaf) cancelAnimationFrame(scoreAnimRaf);
+    scoreTotalEl.textContent = total.toFixed(2);
+
+    staggerEls.forEach(el => {
+      el.style.transition = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+
+    panel.removeEventListener('click', onPanelClick);
+  }
+
+  function onPanelClick() {
+    if (!skipped) revealAll();
+  }
+  panel.addEventListener('click', onPanelClick);
+
+
+  const cellDelay = 80;
+  const cellsStart = 1100;
+  const playAgainDelay = cellsStart + cellEls.length * cellDelay + 100;
+  const saveRowDelay = playAgainDelay + 200;
+  const closeDelay = saveRowDelay + 200;
+
+  function revealEl(el) {
+    if (skipped) return;
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  }
+
+  setTimeout(() => revealEl(scoreRow), 0);
+
   function animTotal(now) {
-    const progress = Math.min((now - startT) / duration, 1);
+    if (!scoreAnimStart) scoreAnimStart = now;
+    const progress = Math.min((now - scoreAnimStart) / SCORE_DURATION, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
     scoreTotalEl.textContent = (eased * total).toFixed(2);
-    if (progress < 1) requestAnimationFrame(animTotal);
-    else scoreTotalEl.textContent = total.toFixed(2);
+    if (progress < 1) {
+      scoreAnimRaf = requestAnimationFrame(animTotal);
+    } else {
+      scoreTotalEl.textContent = total.toFixed(2);
+      scoreAnimRaf = null;
+    }
   }
-  setTimeout(() => requestAnimationFrame(animTotal), 300);
+  setTimeout(() => { if (!skipped) scoreAnimRaf = requestAnimationFrame(animTotal); }, 300);
+
+  setTimeout(() => revealEl(phraseEl), 700);
+
+  cellEls.forEach((cell, i) => {
+    setTimeout(() => revealEl(cell), cellsStart + i * cellDelay);
+  });
+
+  setTimeout(() => revealEl(playAgainBtn), playAgainDelay);
+
+  setTimeout(() => revealEl(saveRow), saveRowDelay);
+
+  setTimeout(() => revealEl(closeBtn), closeDelay);
 }
