@@ -51,7 +51,7 @@ function showSummaryScreen() {
 
   if (isMobile) {
     const gap = 3;
-    const gridW = panel.getBoundingClientRect().width - 56;
+    const gridW = window.innerWidth - 36;
     const cols = count <= 5 ? count : Math.ceil(count / 2);
     const cellSize = Math.min(60, Math.floor((gridW - gap * (cols - 1)) / cols));
     const totalGridW = cols * cellSize + (cols - 1) * gap;
