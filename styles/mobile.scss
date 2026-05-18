@@ -299,31 +299,35 @@
   #summaryPanel {
     padding: 20px 18px 18px;
     border-radius: 0;
-
+  
     .summary-score-total,
     .summary-score-max {
       font-size: 44px;
       letter-spacing: -2px;
     }
-
+  
     .summary-phrase {
       font-size: 13px;
     }
-
+  
     .summary-colors-grid {
-      gap: 4px;
+      gap: 3px;
+      margin-top: 12px !important;
+      margin-bottom: 12px !important;
     }
-
+  
     .summary-color-cell {
-      --cell-size: 54px !important;
+      width: var(--cell-size) !important;
+      height: var(--cell-size) !important;
+      flex-shrink: 0;
     }
-
+  
     .summary-play-again-btn {
       height: 40px;
       font-size: 13px;
       margin-top: 12px;
     }
-
+  
     .summary-close-btn {
       top: 16px;
       right: 16px;

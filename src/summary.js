@@ -46,32 +46,63 @@ function showSummaryScreen() {
   colorsGrid.style.marginBottom = isSingleRow ? 'auto' : '0';
 
   const cellEls = [];
+  const isMobile = window.innerWidth <= 480;
   const count = roundColors.length;
-  const cellSize = count <= 5 ? 72 : count <= 7 ? 60 : 50;
-  roundColors.forEach((entry, i) => {
-    const cell = document.createElement('div');
-    cell.className = 'summary-color-cell';
-    cell.style.setProperty('--cell-size', cellSize + 'px');
 
-    const origHalf = document.createElement('div');
-    origHalf.className = 'orig-half';
-    origHalf.style.background = hslStr(entry.original);
-
-    const guessHalf = document.createElement('div');
-    guessHalf.className = 'guess-half';
-    guessHalf.style.background = hslStr(entry.guess);
-
-    const scoreLabel = document.createElement('span');
-    scoreLabel.className = 'cell-score';
-    scoreLabel.style.color = entry.original.l > 55 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)';
-    scoreLabel.textContent = roundScores[i].toFixed(2);
-
-    cell.appendChild(origHalf);
-    cell.appendChild(guessHalf);
-    cell.appendChild(scoreLabel);
-    colorsGrid.appendChild(cell);
-    cellEls.push(cell);
-  });
+  if (isMobile) {
+    const gap = 3;
+    const gridW = card.getBoundingClientRect().width - 36;
+    const cols = Math.ceil(count / 2);
+    const cellSize = Math.floor((gridW - gap * (cols - 1)) / cols);
+    const totalGridW = cols * cellSize + (cols - 1) * gap;
+    colorsGrid.style.display = 'grid';
+    colorsGrid.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+    colorsGrid.style.width = totalGridW + 'px';
+    colorsGrid.style.gap = gap + 'px';
+    colorsGrid.style.margin = '12px auto';
+    roundColors.forEach((entry, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'summary-color-cell';
+      cell.style.width = cellSize + 'px';
+      cell.style.height = cellSize + 'px';
+      const origHalf = document.createElement('div');
+      origHalf.className = 'orig-half';
+      origHalf.style.background = hslStr(entry.original);
+      const guessHalf = document.createElement('div');
+      guessHalf.className = 'guess-half';
+      guessHalf.style.background = hslStr(entry.guess);
+      const scoreLabel = document.createElement('span');
+      scoreLabel.className = 'cell-score';
+      scoreLabel.style.color = entry.original.l > 55 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)';
+      scoreLabel.textContent = roundScores[i].toFixed(2);
+      cell.appendChild(origHalf);
+      cell.appendChild(guessHalf);
+      cell.appendChild(scoreLabel);
+      colorsGrid.appendChild(cell);
+      cellEls.push(cell);
+    });
+  } else {
+    roundColors.forEach((entry, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'summary-color-cell';
+      cell.style.setProperty('--cell-size', '72px');
+      const origHalf = document.createElement('div');
+      origHalf.className = 'orig-half';
+      origHalf.style.background = hslStr(entry.original);
+      const guessHalf = document.createElement('div');
+      guessHalf.className = 'guess-half';
+      guessHalf.style.background = hslStr(entry.guess);
+      const scoreLabel = document.createElement('span');
+      scoreLabel.className = 'cell-score';
+      scoreLabel.style.color = entry.original.l > 55 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.7)';
+      scoreLabel.textContent = roundScores[i].toFixed(2);
+      cell.appendChild(origHalf);
+      cell.appendChild(guessHalf);
+      cell.appendChild(scoreLabel);
+      colorsGrid.appendChild(cell);
+      cellEls.push(cell);
+    });
+  }
 
   const playAgainBtn = document.createElement('button');
   playAgainBtn.className = 'summary-play-again-btn';
