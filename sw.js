@@ -16,17 +16,20 @@ const ASSETS = [
   '/src/ui.js',
   '/img/logo.png',
   '/img/arrow.png',
+  '/img/arrow-left.png',
+  '/img/arrow-right.png',
   '/img/close.png',
   '/img/dark.png',
+  '/img/light.png',
+  '/img/despit.png',
   '/img/help.png',
   '/img/mode.png',
   '/img/records.png',
+  '/img/search.png',
   '/img/submit.png',
   '/img/training.png',
   '/img/volume.png',
-  '/img/arrow-left.png',
-  '/img/arrow-right.png',
-  '/img/despit.png'
+  '/img/volume-slash.png'
 ];
 
 self.addEventListener('install', e => {
